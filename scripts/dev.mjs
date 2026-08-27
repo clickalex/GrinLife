@@ -6,9 +6,8 @@
  * talks to one origin — Vite proxies /api to the API process. Output is prefixed
  * per process, and SIGINT/SIGTERM take the whole tree down.
  *
- *   node scripts/dev.mjs grinlife   API :3010 + portfolio site :3000
- *   node scripts/dev.mjs landing    Grin Legacy landing :3001
- *   node scripts/dev.mjs all        everything
+ *   node scripts/dev.mjs grinlife   API :3010 + the website :3000
+ *   node scripts/dev.mjs all        same thing, kept as an alias
  */
 import { spawn } from "node:child_process";
 import path from "node:path";
@@ -74,16 +73,10 @@ switch (mode) {
   case "grinlife":
     grinlife();
     break;
-  case "landing":
-    start("legacy", "npx", ["vite", "--host", "0.0.0.0"], "apps/legacy-landing");
-    break;
   case "all":
     grinlife();
-    start("legacy", "npx", ["vite", "--host", "0.0.0.0"], "apps/legacy-landing");
-    start("social", "npx", ["vite", "--host", "0.0.0.0"], "apps/social-landing");
-    start("serendipity", "npx", ["vite", "--host", "0.0.0.0"], "apps/serendipity-landing");
     break;
   default:
-    process.stderr.write(`Unknown mode "${mode}". Use: grinlife | landing | all\n`);
+    process.stderr.write(`Unknown mode "${mode}". Use: grinlife | all\n`);
     process.exit(1);
 }

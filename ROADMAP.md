@@ -79,15 +79,27 @@ P2 is the codebase violating its own strategy. The fix below is not a stylistic 
 
 | App | What it is | Built from |
 |---|---|---|
-| `apps/grinlife` | The portfolio site: hub + a complete roadmap site for each of the three products. | `@grin/ui` + `@grin/content` only |
-| `apps/legacy-landing` | The Wave-1 Phase-0 conversion page the Legacy plan asks for verbatim: *"One page. Sample book photos, 3 sample stories, one price, one CTA."* | `@grin/ui` + `@grin/content` only |
+| `apps/grinlife` | **One website.** Hub + roadmap + live gates + spine + docs, and three product routes that each carry the marketing case for the product *and* its phase plan. | `@grin/ui` + `@grin/content` + `@grin/api` only |
 
-Both apps consume the same two packages and contain no duplicated components. That is the reuse claim, and it is the thing the tests check.
+The three products were first built as separate front-ends (`apps/legacy-landing`,
+`apps/social-landing`, `apps/serendipity-landing`) and then merged into this single site at the
+owner's request. The merge is the right call for reuse — one bundle, one design system, one
+content package, zero duplicated sections — and it costs one thing, recorded below under
+*Deliberate deviation*. The pre-merge state is preserved at commit `86fb7d0`.
+
+Every product route is one `<ProductSite product={...} phases={...} landing={...} />` call.
+`landing` holds the sections that argue for the product (`src/sections/<product>/Overview.tsx`
+plus its siblings); everything below it — phases, metrics, risks, compliance, pricing, sources
+— is derived from the `Product` record. The reuse claim is that no route contains a component
+of its own, and that is what the tests check.
 
 ### Stage 3 — Later (out of scope for this build, recorded so it is not lost)
 
 1. Replace the static content package with an API once the plan needs live gate status.
-2. Add the GrinSocial and Serendipity landing apps when their gates pass — each should be ~a data file plus a route, because the components already exist.
+2. ~~Add the GrinSocial and Serendipity landing apps when their gates pass.~~ Done, and then
+   superseded: all three products are routes on one site. Re-splitting a product into its own
+   front-end is still cheap if the brand architecture ever needs it — move its
+   `sections/<product>/` folder into a new app and pass the same components to `ProductSite`.
 3. Wire the gate checklists to real metrics rather than documented targets.
 4. Retire `Demo/*.zip` once the monorepo supersedes them; keep `Demo/DOCS/` as the source of record.
 
@@ -97,7 +109,7 @@ Both apps consume the same two packages and contain no duplicated components. Th
 |---|---|---|
 | Types | `npm run typecheck` | `tsc --noEmit` clean across all packages and apps. |
 | Tests | `npm test` | Content-integrity tests + component render tests pass. |
-| Build | `npm run build` | Both apps produce production bundles; the Express server bundles. |
+| Build | `npm run build` | The app produces a production bundle; the Express server bundles. |
 | Serve | `npm start` | Production server returns 200 and the SPA shell on deep links. |
 
 ---
@@ -115,26 +127,33 @@ Both apps consume the same two packages and contain no duplicated components. Th
 | `packages/grin-ui` hooks | 5 | useScrollSpy, useReducedMotion, useLocalStorage, useMediaQuery, useInView |
 | `packages/grin-content` modules | 8 | portfolio, legacy, social, serendipity, gateInputs, gateStatus, types, index |
 | `packages/grin-api` | 2 | `GateStore` (atomic JSON persistence) and the Express router that mounts it |
-| `apps/grinlife` routes | 9 | `/`, `/roadmap`, `/gates`, `/spine`, `/docs`, three product routes, 404 |
-| `apps/legacy-landing` | 1 page | The Phase-0 brief: one page, three sample stories, one price, one CTA |
-| `apps/social-landing` | 1 page | Feed-free matching, one city at a time, city waitlist, published obligations |
-| `apps/serendipity-landing` | 1 page | Quarantined brand, text-only, Permanent button, closed beta |
+| `apps/grinlife` routes | 8 + 404 | `/`, `/roadmap`, `/gates`, `/spine`, `/docs`, and the three product routes |
+| `sections/legacy/` | 6 files | Overview, HowItWorks, SampleStories, Occasions, Included, Order — the Phase-0 brief: one page, three sample stories, one price, one CTA |
+| `sections/social/` | 3 files | Overview, Safety, Waitlist — feed-free matching, one city at a time, city waitlist |
+| `sections/serendipity/` | 3 files | Overview, Safety, Beta — text-only, Permanent button, closed beta |
 
-54 package source files carry the design system, content model and API. 41 app source files
-carry composition. **No app contains a component of its own.**
+55 package source files carry the design system, content model and API. 28 app source files
+carry composition. **No route contains a component of its own.**
 
 ### Verification results, as run
 
 | Check | Result |
 |---|---|
-| `npm install` | Workspaces linked: `@grin/{ui,content,api}` and all four apps |
-| `tsc --noEmit -p tsconfig.json` | exit 0, no diagnostics, across three packages and four apps |
-| `vitest run` | **110 passed, 0 failed**, 9 test files |
-| `npm run build` | All four apps build — 39.46 / 38.57 / 39.16 / 38.59 kB CSS and 108.76 / 92.75 / 91.25 / 91.05 kB gzipped JS; grinlife's server bundle is 48.5 kB because it embeds the API |
-| Live dev servers | API on `:3010`; sites on `:3000`, `:3001`, `:3002`, `:3003` — all 200 |
+| `npm install` | Workspaces linked: `@grin/{ui,content,api}` and the app; the three removed apps unlinked (`removed 3 packages`) |
+| `npm run verify` | exit 0 — typecheck, tests and build in one pass |
+| `tsc --noEmit -p tsconfig.json` | exit 0, no diagnostics, across three packages and the app |
+| `vitest run` | **93 passed, 0 failed**, 7 test files |
+| `npm run build` | 40.75 kB CSS (7.88 kB gzip) and 381.64 kB JS (**119.44 kB gzip**); the server bundle is 48.5 kB because it embeds the API |
+| Live dev server | One site on `:3000`, API on `:3010`. All 8 routes + the 404 path → 200 |
 | API through the browser's origin | `GET /api/health` → `{"ok":true,"service":"grin-status","gates":2}` via the Vite proxy on `:3000` |
 | Gate round-trip | 4× `PATCH /api/gates/gate-1/criteria/n` → 200; verdict `4/4 clear=true`; file `apps/grinlife/data/gate-status.json` written; `POST /api/gates/reset` → back to `0/4 clear=false` |
-| Production servers | 200 on every route including deep links and unknown paths; CSS served as `text/css` |
+| Bundle actually contains all three products | `"One beautiful book"`, `"No follower count"` and `"waiting for the other person"` each present in `dist/public/assets/index-*.js` |
+| Tailwind purge guard | `bg-coral`, `bg-moss`, `bg-violet`, `bg-honey` all present in the built CSS |
+
+The bundle cost of merging is real and worth stating: 108.76 kB → 119.44 kB gzipped JS, because
+one file now carries three products' worth of copy instead of one. That is the trade for one
+origin, one header, one design system and no duplicated sections. If first paint on a product
+route ever needs to be cheaper, `React.lazy` on the three product pages is a contained fix.
 
 ### What the tests actually exercise
 
@@ -150,10 +169,16 @@ carry composition. **No app contains a component of its own.**
 - `App.test.tsx` for grinlife (19) — renders the real `App` at every route through the real
   router, asserts each route renders a *distinct* page, and asserts the gates page falls back
   to browser-local storage when the API is unreachable.
-- One `App.test.tsx` per landing page (4 + 5 + 6) — including a check that no `<img>` points at
-  a remote host (defect P4), and the brand-quarantine assertions for Serendipity.
-- `tests/sources.test.ts` (17) — for every app, resolves each `@source` glob in its CSS to a
-  real directory and asserts both shared packages are scanned.
+- `ProductPages.test.tsx` (10) — the tests that came across with the three landing apps, now
+  run against the merged routes. They assert each product page really does carry *both* halves:
+  the marketing content (sample stories, the book illustration, the tier tables, the Permanent
+  button mock) and the plan-derived content (`#legacy-phases`, `#serendipity-overview`, every
+  compliance obligation). Also the no-remote-`<img>` check (defect P4) and the
+  brand-quarantine assertions for Serendipity.
+- `tests/sources.test.ts` (5) — resolves each `@source` glob in the app's CSS to a real
+  directory and asserts both shared packages are scanned. It was 17 while there were four
+  apps; the assertions are per-app, so merging removed twelve of them without removing
+  coverage of the one CSS file that now exists.
 
 ### Three defects found and fixed during verification
 
@@ -162,8 +187,8 @@ carry composition. **No app contains a component of its own.**
    level, so Tailwind never scanned `packages/grin-ui/src` and silently dropped every utility
    used inside a shared component — while the build still succeeded. Corrected, the CSS is
    39.46 kB with the full accent set (`bg-coral`, `bg-moss`, `bg-violet`, `bg-honey` and their
-   soft/ink variants). `tests/sources.test.ts` exists so this cannot recur
-   unnoticed.
+   soft/ink variants), and 40.75 kB today with all three products merged into it.
+   `tests/sources.test.ts` exists so this cannot recur unnoticed.
 2. **A route test that passed for the wrong reason.** The first version rendered each route
    with wouter's `ssrPath`, which jsdom ignores — so all nine routes silently rendered the
    home page and every assertion passed. Rewritten to drive the History API, plus an explicit
@@ -172,12 +197,32 @@ carry composition. **No app contains a component of its own.**
    did not exist. Replaced by `scripts/dev.mjs`, which now launches the status API and the
    front-ends behind one origin.
 
+### Deliberate deviation: Serendipity's brand quarantine
+
+The plan's brand architecture keeps Serendipity in a separate legal entity with *nothing*
+public-facing in common with Grin, on its own domain. **Putting it on this site breaks that
+rule**, because the shared header says GrinLife and the origin is shared. This was an explicit
+instruction from the owner, so it is implemented — but it is recorded here rather than absorbed
+silently, and the enforcement was rescoped rather than deleted:
+
+| Was | Now |
+|---|---|
+| `serendipity-landing/src/App.test.tsx` failed if the word "Grin" appeared *anywhere in the page* | That assertion cannot hold on a shared site — the header is Grin. It now runs against `#serendipity-overview`, Serendipity's own copy, which must contain no Grin reference |
+| The rename row from the plan is never published | Still asserted, page-wide: `nonNegotiables[3].original` must not appear in the rendered DOM |
+
+One honest limit on that second guarantee: `"GrinLuck"` still ships inside the JS bundle,
+because it is content data (`serendipity.formerName`, `nonNegotiables[3].original`, and the
+brand-architecture row in `portfolio.ts`). No page renders it, and the test proves that, but a
+determined reader could find it in the bundle source. Making that true in the strong sense
+means either splitting the front-end back out or keeping the pre-rename name out of the shipped
+content package.
+
 ### Closed from the original open list
 
 | Was open | Now |
 |---|---|
 | "Gate checklists persist to `localStorage` only" | `@grin/api` persists measurements server-side; the browser fallback remains and is labelled on screen |
-| "The GrinSocial and Serendipity landing apps are not built" | Both built, both from the shared spine, both with route tests |
+| "The GrinSocial and Serendipity landing apps are not built" | Built as separate apps, then merged into one site — both products now have a route, built from the shared spine, with page tests |
 | "The `Demo/*.zip` archives are unreferenced" | `Demo/README.MD` documents all four with the duplication measurements; their eleven design notes are extracted to `Demo/design-notes/` so the rationale is readable and diffable |
 
 The archives themselves are deliberately **not** deleted — they remain the only record of the
@@ -187,6 +232,8 @@ four original implementations. Removing them is a one-line change if that is wan
 
 - Gate targets are the plan's numbers; wiring them to real Stripe, print-fulfilment and
   retention feeds is the next step, and needs those systems to exist.
-- The landing pages use `mailto:` for their CTAs. Phase 0 is concierge by design, but a real
+- The product pages use `mailto:` for their CTAs. Phase 0 is concierge by design, but a real
   checkout belongs there once the fake-door test has run.
+- The Serendipity quarantine described above. Restoring it is a small, well-defined change:
+  move `sections/serendipity/` into its own app and drop the `landing` prop.
 - No CI. `npm run verify` is the whole gate and it is run by hand.

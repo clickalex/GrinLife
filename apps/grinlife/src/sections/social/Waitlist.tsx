@@ -62,7 +62,7 @@ export function Waitlist() {
             >
               Register your city
             </ButtonLink>
-            <ButtonLink href="#price" variant="outline" size="lg">
+            <ButtonLink href="#social-pricing" variant="outline" size="lg">
               See the price first
             </ButtonLink>
           </div>

@@ -1,9 +1,13 @@
 /**
- * Wave 2 — GrinSocial. Same template, same components, different data.
+ * Wave 2 — GrinSocial. One route carrying the product story and its phase plan.
+ * Same template, same components, different data.
  */
 import { Callout, ProductSite, useLocalStorage } from "@grin/ui";
 import { social, socialPhases, socialPricing } from "@grin/content";
 import { Link } from "../router";
+import { Overview } from "../sections/social/Overview";
+import { Safety } from "../sections/social/Safety";
+import { Waitlist } from "../sections/social/Waitlist";
 
 export default function Social() {
   const [explored, setExplored] = useLocalStorage<string[]>("grinlife:explored-phases", []);
@@ -22,6 +26,13 @@ export default function Social() {
       onExplored={toggle}
       next={{ label: "Serendipity — Wave 3", href: "/products/serendipity" }}
       Link={Link}
+      landing={
+        <>
+          <Overview />
+          <Safety />
+          <Waitlist />
+        </>
+      }
       afterCompliance={
         <Callout tone="note" label="How to judge this product">
           <p>

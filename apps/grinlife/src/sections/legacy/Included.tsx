@@ -1,5 +1,4 @@
-import { Accordion, Eyebrow, Heading, Lede, PricingTable, Section } from "@grin/ui";
-import { legacyPricing, legacyPricingNote } from "@grin/content";
+import { Accordion, Eyebrow, Heading, Lede, Section } from "@grin/ui";
 
 const faqs = [
   {
@@ -62,7 +61,6 @@ const faqs = [
 
 export function Included() {
   return (
-    <>
       <Section sectionId="included">
         <div className="space-y-8">
           <div className="space-y-3">
@@ -78,20 +76,6 @@ export function Included() {
         </div>
       </Section>
 
-      <Section sectionId="price" tone="paper">
-        <div className="space-y-6">
-          <div className="space-y-3">
-            <Eyebrow accent="honey">One price, no subscription trap</Eyebrow>
-            <Heading size="title">₹6,999 for the book. That is the whole thing.</Heading>
-            <Lede>
-              Fifty-two prompts, a year of weekly nudges, human editing, the family archive, and a hardcover
-              with voice QR codes. Extra copies whenever you want them.
-            </Lede>
-          </div>
 
-          <PricingTable accent="honey" tiers={legacyPricing} note={legacyPricingNote} />
-        </div>
-      </Section>
-    </>
   );
 }

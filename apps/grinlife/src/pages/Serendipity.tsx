@@ -1,18 +1,18 @@
 /**
- * Wave 3 — Serendipity. Quarantined by brand policy: it reuses this codebase, but
- * the plan is explicit that it shares nothing public-facing with the Grin name.
+ * Wave 3 — Serendipity. One route carrying the product story and its phase plan.
+ *
+ * Note the deviation: the portfolio plan puts this product in a separate legal
+ * entity with no public linkage to Grin. Merging the front-ends into one website
+ * puts it on the same domain as the other two, which the plan argues against. The
+ * page copy still carries no Grin reference and that is asserted by a test, but the
+ * structural separation is gone. See ROADMAP.md, "Deliberate deviation".
  */
-import {
-  Callout,
-  DataTable,
-  Eyebrow,
-  Heading,
-  ProductSite,
-  TermTable,
-  useLocalStorage,
-} from "@grin/ui";
-import { nonNegotiables, serendipity, serendipityClosing, serendipityPhases, structure } from "@grin/content";
+import { Callout, Eyebrow, Heading, ProductSite, TermTable, useLocalStorage } from "@grin/ui";
+import { serendipity, serendipityClosing, serendipityPhases, structure } from "@grin/content";
 import { Link } from "../router";
+import { Overview } from "../sections/serendipity/Overview";
+import { Safety } from "../sections/serendipity/Safety";
+import { Beta } from "../sections/serendipity/Beta";
 
 export default function Serendipity() {
   const [explored, setExplored] = useLocalStorage<string[]>("grinlife:explored-phases", []);
@@ -30,29 +30,17 @@ export default function Serendipity() {
       onExplored={toggle}
       next={{ label: "Back to the portfolio", href: "/" }}
       Link={Link}
+      landing={
+        <>
+          <Overview />
+          <Safety />
+          <Beta />
+        </>
+      }
       beforeMetrics={
+        // §1, the corrected spec, is published once by sections/serendipity/Safety.tsx in
+        // the landing above this chapter. Only §2 remains here, so no table appears twice.
         <div className="space-y-10">
-          <div className="space-y-5">
-            <div className="space-y-3">
-              <Eyebrow accent="violet">§1 — Four non-negotiable changes</Eyebrow>
-              <Heading size="title">The original spec, corrected</Heading>
-            </div>
-            <DataTable
-              accent="violet"
-              caption="Four non-negotiable changes to the original spec"
-              head={["Original", "Replace with", "Why"]}
-              rows={nonNegotiables.map((row) => [
-                <span key="o" className="font-semibold text-muted-foreground line-through decoration-violet/50">
-                  {row.original}
-                </span>,
-                <span key="r" className="font-bold text-foreground">
-                  {row.replace}
-                </span>,
-                <span key="w">{row.why}</span>,
-              ])}
-            />
-          </div>
-
           <div className="space-y-5">
             <div className="space-y-3">
               <Eyebrow accent="violet">§2 — Structure</Eyebrow>

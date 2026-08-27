@@ -6,9 +6,8 @@ import {
   Heading,
   Lede,
   Section,
-  TermTable,
 } from "@grin/ui";
-import { nonNegotiables, serendipity } from "@grin/content";
+import { nonNegotiables } from "@grin/content";
 
 /**
  * The safety model and the price, together.
@@ -101,15 +100,9 @@ export function Safety() {
             />
           </div>
 
-          <div className="space-y-4">
-            <Eyebrow accent="violet">Obligations</Eyebrow>
-            <TermTable
-              accent="violet"
-              caption="Serendipity compliance obligations"
-              head={["Obligation", "What it means"]}
-              rows={serendipity.compliance.map((row) => ({ term: row.obligation, detail: row.detail }))}
-            />
-          </div>
+          {/* The obligation-by-obligation table is published once, by ProductSite from
+              serendipity.compliance, under the Compliance chapter. This section covers the
+              design decisions that make those obligations achievable. */}
 
           <Callout tone="kill" label="Hard stop">
             <p>

@@ -1,14 +1,5 @@
-import {
-  Callout,
-  Card,
-  Eyebrow,
-  Heading,
-  Lede,
-  PricingTable,
-  Section,
-  TermTable,
-} from "@grin/ui";
-import { social, socialPricing } from "@grin/content";
+import { Callout, Card, Eyebrow, Heading, Lede, Section } from "@grin/ui";
+import { social } from "@grin/content";
 
 /**
  * Safety and price together, because on a stranger-to-stranger product they are the
@@ -16,26 +7,7 @@ import { social, socialPricing } from "@grin/content";
  */
 export function Safety() {
   return (
-    <>
-      <Section sectionId="price" tone="paper">
-        <div className="space-y-6">
-          <div className="space-y-3">
-            <Eyebrow accent="moss">Price</Eyebrow>
-            <Heading size="title">The core stays free. There are no ads to sell you.</Heading>
-            <Lede>
-              We removed the feed, so advertising is out — which is a feature, not a bug, but it means
-              subscriptions and event fees carry the product.
-            </Lede>
-          </div>
 
-          <PricingTable
-            accent="moss"
-            tiers={socialPricing}
-            currencyLabel="Free at the core · optional upgrades"
-            note="Paid local meetups are the line we expect to grow fastest: people pay for structured time in a room with other people. Verified communities — running clubs, alumni bodies, coworking spaces — pay for a managed group with tools."
-          />
-        </div>
-      </Section>
 
       <Section sectionId="safety">
         <div className="space-y-8">
@@ -48,12 +20,10 @@ export function Safety() {
             </Lede>
           </div>
 
-          <TermTable
-            accent="moss"
-            caption="GrinSocial safety and compliance obligations"
-            head={["Obligation", "What it means for you as a user"]}
-            rows={social.compliance.map((row) => ({ term: row.obligation, detail: row.detail }))}
-          />
+          {/* The obligation-by-obligation table is published once, by ProductSite from
+              social.compliance, under the Compliance chapter. Restating it here would put
+              the same legal text on the page twice and give the two copies a chance to
+              disagree. This section explains *why* each duty exists. */}
 
           <div className="grid gap-5 lg:grid-cols-2">
             <Card accent="moss" variant="paper" className="p-6">
@@ -94,6 +64,5 @@ export function Safety() {
           </p>
         </div>
       </Section>
-    </>
   );
 }

@@ -30,6 +30,12 @@ export interface ProductSiteProps {
   /** Anything product-specific that the shared template should not know about. */
   beforeMetrics?: React.ReactNode;
   afterCompliance?: React.ReactNode;
+  /**
+   * The product's own story — pitch, how it works, samples, ordering. Rendered
+   * above the plan so one route carries both the case for the product and the
+   * phases that build it.
+   */
+  landing?: React.ReactNode;
   /** Remembers which phases the reader has visited. */
   exploredPhases?: string[];
   onExplored?: (phaseId: string) => void;
@@ -52,6 +58,7 @@ export function ProductSite({
   pricingNote,
   beforeMetrics,
   afterCompliance,
+  landing,
   exploredPhases = [],
   onExplored,
   next,
@@ -61,6 +68,7 @@ export function ProductSite({
   const a = accentOf(accent);
 
   const chapters: ChapterItem[] = [
+    ...(landing ? [{ id: `${product.id}-overview`, label: "The product", accent, caption: "Start here" }] : []),
     { id: `${product.id}-one-page`, label: "In one page", accent },
     { id: `${product.id}-phases`, label: "Phases", accent, caption: `${phases.length} stops` },
     ...(pricing ? [{ id: `${product.id}-pricing`, label: "Pricing", accent }] : []),
@@ -122,6 +130,12 @@ export function ProductSite({
             ))}
           </Callout>
         </Section>
+      ) : null}
+
+      {landing ? (
+        <div id={`${product.id}-overview`} className="scroll-mt-24">
+          {landing}
+        </div>
       ) : null}
 
       <Section sectionId={`${product.id}-one-page`}>

@@ -62,7 +62,7 @@ export function Order() {
             <ButtonLink href="mailto:hello@grinlegacy.example?subject=Start%20a%20Grin%20Legacy%20book" accent="honey" size="lg">
               Email the concierge desk
             </ButtonLink>
-            <ButtonLink href="#price" variant="outline" size="lg">
+            <ButtonLink href="#legacy-pricing" variant="outline" size="lg">
               See all three tiers
             </ButtonLink>
           </div>

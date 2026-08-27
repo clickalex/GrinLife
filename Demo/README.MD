@@ -54,5 +54,7 @@ a `__manus__` debug-log collector, a storage proxy that needs
 `wouter` patch whose only effect is pushing route paths into
 `window.__WOUTER_ROUTES__`.
 
-The monorepo replaces all four with two shared packages and four front-ends that
-contain no components of their own. See `ROADMAP.md` at the repository root.
+The monorepo replaces all four with three shared packages (`@grin/ui`, `@grin/content`,
+`@grin/api`) and one website whose routes contain no components of their own. The four
+archive sites became one site with eight routes; the pre-merge multi-app layout is preserved
+at commit `86fb7d0`. See `ROADMAP.md` at the repository root.
