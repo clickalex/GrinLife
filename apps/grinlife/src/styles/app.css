@@ -1,0 +1,19 @@
+/**
+ * GrinLife front-end styles.
+ *
+ * Tailwind is imported here (not in the design system) so this app controls which
+ * source trees get scanned for classes. `@grin/ui` and `@grin/content` live outside
+ * this app's directory, so they must be registered explicitly — without those two
+ * lines every utility used inside a shared component is purged and the shared
+ * components render unstyled.
+ *
+ * `@source` paths are relative to THIS file (apps/grinlife/src/styles/app.css),
+ * so the monorepo root is four levels up. `scripts/check-sources` asserts that.
+ */
+
+@import "tailwindcss";
+@import "@grin/ui/styles/tokens.css";
+
+@source "..";
+@source "../../../../packages/grin-ui/src";
+@source "../../../../packages/grin-content/src";

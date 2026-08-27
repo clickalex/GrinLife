@@ -1,0 +1,24 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node", "vite/client"],
+    "baseUrl": ".",
+    "paths": {
+      "@grin/ui": ["./packages/grin-ui/src/index.ts"],
+      "@grin/ui/*": ["./packages/grin-ui/src/*"],
+      "@grin/content": ["./packages/grin-content/src/index.ts"]
+    }
+  },
+  "include": [
+    "packages/*/src/**/*.ts",
+    "packages/*/src/**/*.tsx",
+    "apps/*/src/**/*.ts",
+    "apps/*/src/**/*.tsx",
+    "apps/*/server/**/*.ts",
+    "apps/*/vite.config.ts",
+    "tests/**/*.ts",
+    "vitest.config.ts",
+    "vitest.setup.ts"
+  ],
+  "exclude": ["node_modules", "dist", "Demo"]
+}
