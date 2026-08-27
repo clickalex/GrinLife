@@ -98,8 +98,9 @@ export function Waitlist() {
           </ul>
 
           <p className="mt-5 rounded-lg bg-muted/60 p-4 text-xs leading-relaxed text-muted-foreground">
-            First launch target: 1,500 users in one city, at least 25 active groups, and 60% of people replying
-            to a match in week one. Below that, the city is not ready and we do not open the next one.
+            First launch target: 1,500 users in one city, at least 25 active groups, and 60% of people
+            replying to a match in week one. Below that, the city is not ready and we do not open the next
+            one.
           </p>
         </Card>
       </div>

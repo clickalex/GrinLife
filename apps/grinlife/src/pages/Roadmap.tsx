@@ -118,8 +118,8 @@ export default function Roadmap() {
               <Eyebrow>Phase plans</Eyebrow>
               <Heading size="title">Every phase, in strict order</Heading>
               <Lede>
-                Switch the simple / full-detail control in the header to read these as a plain-English trail or
-                as delivery detail. Your choice is remembered.
+                Switch the simple / full-detail control in the header to read these as a plain-English trail
+                or as delivery detail. Your choice is remembered.
               </Lede>
             </div>
             <Tabs items={tabs} label="Choose a product to read its phases" />

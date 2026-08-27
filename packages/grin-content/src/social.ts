@@ -82,7 +82,7 @@ export const social: Product = {
       risk: "Becomes a dating app",
       severity: "High",
       mitigation:
-        "Every platonic app drifts this way. Explicit community standards, an \"intent\" preference, fast enforcement on unwanted romantic advances.",
+        'Every platonic app drifts this way. Explicit community standards, an "intent" preference, fast enforcement on unwanted romantic advances.',
     },
     {
       risk: "Moderation cost",
@@ -121,7 +121,7 @@ export const social: Product = {
     {
       obligation: "Data retention",
       detail:
-        "Removed content and related records retained 180 days for law enforcement. Note the tension with \"ephemeral by default\" — see below.",
+        'Removed content and related records retained 180 days for law enforcement. Note the tension with "ephemeral by default" — see below.',
     },
     {
       obligation: "SSMI threshold",
@@ -199,7 +199,7 @@ export const socialPhases: Phase[] = [
         items: [
           "Relax the cap at launch — 5–10 matches/week is correct at maturity and fatal at launch. Start at 10–15 and tighten as density grows. An empty week is the #1 churn event.",
           "Never show an empty week — if no good match exists, surface a group, a local event, or an honest \"the city's still filling up — here's who joined this week.\" Silence reads as abandonment.",
-          "Kill the ghosting spiral — Bumble BFF's \"both must speak in 72h or it expires\" mechanic was widely hated. Use gentle expiry with a one-tap \"still interested\" instead of a hard clock.",
+          'Kill the ghosting spiral — Bumble BFF\'s "both must speak in 72h or it expires" mechanic was widely hated. Use gentle expiry with a one-tap "still interested" instead of a hard clock.',
           "Events beat matching — the two patterns that actually work for friendship are events and pre-existing communities. Build a lightweight local-event layer early; it creates density that pure matching cannot.",
         ],
       },
@@ -207,14 +207,19 @@ export const socialPhases: Phase[] = [
         kind: "list",
         heading: "The ephemerality conflict — resolve it now",
         items: [
-          "Product A's \"chats live in RAM only, never touch a database\" cannot coexist with a 24-hour takedown duty, a 15-day grievance process and 180-day retention of removed content.",
+          'Product A\'s "chats live in RAM only, never touch a database" cannot coexist with a 24-hour takedown duty, a 15-day grievance process and 180-day retention of removed content.',
           "Resolution: chats are ephemeral to users — auto-deleted from their view unless both consent to persist — while a short-window encrypted server-side log exists solely for safety and legal response, with retention stated plainly in the privacy policy.",
           "Users get the ephemeral experience; you keep the ability to answer a court order.",
         ],
       },
     ],
     sprints: [
-      { sprint: "M13", ships: "Preference model, tag taxonomy, onboarding", reuse: "Auth, identity", shared: true },
+      {
+        sprint: "M13",
+        ships: "Preference model, tag taxonomy, onboarding",
+        reuse: "Auth, identity",
+        shared: true,
+      },
       {
         sprint: "M14",
         ships: "Matching engine — tag overlap + geo + weekly cap",
@@ -269,7 +274,7 @@ export const socialPhases: Phase[] = [
         heading: "Expansion rules",
         items: [
           "Waitlist by city. Collect signups from everywhere; activate a city only at ~500 waitlisted. Scarcity also creates launch energy.",
-          "Vertical density beats geographic spread. \"Runners in Lucknow\" works at 300 people. \"Everyone in North India\" fails at 3,000.",
+          'Vertical density beats geographic spread. "Runners in Lucknow" works at 300 people. "Everyone in North India" fails at 3,000.',
           "Groups become the retention engine. 1:1 matching brings people in; groups keep them. Track group health, not just match counts.",
           "Journey groups are your differentiator. Trip-specific groups that auto-archive are genuinely novel — lean into travel as a wedge vertical.",
         ],

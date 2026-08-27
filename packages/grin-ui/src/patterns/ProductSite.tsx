@@ -68,7 +68,9 @@ export function ProductSite({
   const a = accentOf(accent);
 
   const chapters: ChapterItem[] = [
-    ...(landing ? [{ id: `${product.id}-overview`, label: "The product", accent, caption: "Start here" }] : []),
+    ...(landing
+      ? [{ id: `${product.id}-overview`, label: "The product", accent, caption: "Start here" }]
+      : []),
     { id: `${product.id}-one-page`, label: "In one page", accent },
     { id: `${product.id}-phases`, label: "Phases", accent, caption: `${phases.length} stops` },
     ...(pricing ? [{ id: `${product.id}-pricing`, label: "Pricing", accent }] : []),
@@ -114,7 +116,8 @@ export function ProductSite({
               <div>
                 <dt className="grin-label text-muted-foreground">Brand tier</dt>
                 <dd className="mt-1 font-semibold capitalize text-foreground">
-                  {product.brand} {product.brand === "quarantined" ? "· zero shared equity" : "· shared equity"}
+                  {product.brand}{" "}
+                  {product.brand === "quarantined" ? "· zero shared equity" : "· shared equity"}
                 </dd>
               </div>
             </dl>
@@ -124,7 +127,10 @@ export function ProductSite({
 
       {product.readThisFirst ? (
         <Section tone="paper" spacing="tight">
-          <Callout tone={product.status === "conditional" ? "kill" : "note"} label={product.readThisFirst.heading}>
+          <Callout
+            tone={product.status === "conditional" ? "kill" : "note"}
+            label={product.readThisFirst.heading}
+          >
             {product.readThisFirst.body.map((paragraph) => (
               <p key={paragraph.slice(0, 24)}>{paragraph}</p>
             ))}
@@ -166,8 +172,8 @@ export function ProductSite({
                 <Eyebrow accent={accent}>Phase plan</Eyebrow>
                 <Heading size="title">{phases.length} phases, in strict order</Heading>
                 <Lede>
-                  Each phase has an exit criterion. A phase that misses its criterion does not get to hand off to
-                  the next one — the same discipline as the portfolio gates, applied one level down.
+                  Each phase has an exit criterion. A phase that misses its criterion does not get to hand off
+                  to the next one — the same discipline as the portfolio gates, applied one level down.
                 </Lede>
               </div>
 
@@ -207,11 +213,7 @@ export function ProductSite({
                     : "Tracked monthly. The right-hand column is the number the gate decision actually uses."}
                 </Lede>
               </div>
-              <MetricTable
-                accent={accent}
-                columns={product.metrics.columns}
-                rows={product.metrics.rows}
-              />
+              <MetricTable accent={accent} columns={product.metrics.columns} rows={product.metrics.rows} />
             </div>
 
             <div id={`${product.id}-risks`} className="scroll-mt-28 space-y-5">

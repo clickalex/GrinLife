@@ -24,15 +24,18 @@ afterEach(() => {
 });
 
 describe("every route", () => {
-  it.each(routes.filter((route) => route !== "/404"))("renders %s with a heading, nav and footer", (route) => {
-    renderAt(route);
+  it.each(routes.filter((route) => route !== "/404"))(
+    "renders %s with a heading, nav and footer",
+    (route) => {
+      renderAt(route);
 
-    const heading = screen.getByRole("heading", { level: 1 });
-    expect(heading.textContent?.trim().length, route).toBeGreaterThan(3);
-    expect(screen.getByRole("navigation", { name: "Primary" })).toBeTruthy();
-    expect(screen.getByRole("contentinfo")).toBeTruthy();
-    expect(document.getElementById("main")).toBeTruthy();
-  });
+      const heading = screen.getByRole("heading", { level: 1 });
+      expect(heading.textContent?.trim().length, route).toBeGreaterThan(3);
+      expect(screen.getByRole("navigation", { name: "Primary" })).toBeTruthy();
+      expect(screen.getByRole("contentinfo")).toBeTruthy();
+      expect(document.getElementById("main")).toBeTruthy();
+    },
+  );
 
   it("serves the 404 page for an unknown path", () => {
     renderAt("/this-stop-does-not-exist");
@@ -121,9 +124,7 @@ describe("gates page", () => {
 
     // jsdom has no server behind /api/gates, so the fetch fails and the page must
     // say so rather than imply the decision was recorded.
-    await waitFor(() =>
-      expect(screen.getByText(/No status API — browser-local/)).toBeTruthy(),
-    );
+    await waitFor(() => expect(screen.getByText(/No status API — browser-local/)).toBeTruthy());
     expect(screen.getAllByText(/Saved in browser/)).toHaveLength(2);
   });
 });

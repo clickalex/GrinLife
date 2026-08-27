@@ -1,10 +1,4 @@
-import type {
-  DocumentEntry,
-  Gate,
-  RelayTrack,
-  SpineRow,
-  TermDetail,
-} from "./types";
+import type { DocumentEntry, Gate, RelayTrack, SpineRow, TermDetail } from "./types";
 
 /**
  * Portfolio-level content, transcribed from `Demo/DOCS/Grin-Three-Product-Plan.html`.
@@ -112,18 +106,30 @@ export const relayTracks: RelayTrack[] = [
 
 /** §4 — Shared Spine. */
 export const spineIntro =
-  "Three products does not have to mean three codebases. The one caveat in the \"don't build two products\" literature is telling: micro-apps are fine as long as they share the same code base. The portfolio only works if you build the spine once, deliberately, in Wave 1.";
+  'Three products does not have to mean three codebases. The one caveat in the "don\'t build two products" literature is telling: micro-apps are fine as long as they share the same code base. The portfolio only works if you build the spine once, deliberately, in Wave 1.';
 
 export const spineRows: SpineRow[] = [
   { service: "Identity & auth", legacy: true, social: true, luck: true, builtIn: "Wave 1" },
   { service: "Messaging / realtime", legacy: true, social: true, luck: true, builtIn: "Wave 1" },
-  { service: "Media pipeline (voice, transcode)", legacy: true, social: true, luck: false, builtIn: "Wave 1" },
+  {
+    service: "Media pipeline (voice, transcode)",
+    legacy: true,
+    social: true,
+    luck: false,
+    builtIn: "Wave 1",
+  },
   { service: "Transcription + LLM shaping", legacy: true, social: false, luck: false, builtIn: "Wave 1" },
   { service: "Billing & subscriptions", legacy: true, social: true, luck: true, builtIn: "Wave 1" },
   { service: "Consent / permanence engine", legacy: true, social: true, luck: true, builtIn: "Wave 1" },
   { service: "Groups & membership lifecycle", legacy: true, social: true, luck: false, builtIn: "Wave 2" },
   { service: "Matching engine (tag → random)", legacy: false, social: true, luck: true, builtIn: "Wave 2" },
-  { service: "Trust & safety / moderation", legacy: true, social: true, luck: true, builtIn: "Wave 2, hardened in 3" },
+  {
+    service: "Trust & safety / moderation",
+    legacy: true,
+    social: true,
+    luck: true,
+    builtIn: "Wave 2, hardened in 3",
+  },
   { service: "Age assurance", legacy: false, social: true, luck: true, builtIn: "Wave 2" },
 ];
 
@@ -143,13 +149,13 @@ export const brandArchitecture = {
   },
   quarantined: {
     heading: "Quarantined — zero shared equity",
-    products: "Serendipity (not \"GrinLuck\")",
+    products: 'Serendipity (not "GrinLuck")',
     detail:
-      "Separate legal entity, separate domain, separate company page, no shared founder bios, no cross-links, no \"a Grin company\" footer. Reuses the private codebase; shares nothing public-facing.",
+      'Separate legal entity, separate domain, separate company page, no shared founder bios, no cross-links, no "a Grin company" footer. Reuses the private codebase; shares nothing public-facing.',
     domain: "serendipity.app — unaffiliated in public",
   },
   holdFirm:
-    "The name \"GrinLuck\" is the problem — it does exactly what risk isolation must prevent, by advertising the family connection in the product name itself. Drop the Grin prefix on Product A entirely.",
+    'The name "GrinLuck" is the problem — it does exactly what risk isolation must prevent, by advertising the family connection in the product name itself. Drop the Grin prefix on Product A entirely.',
 };
 
 /** §6 — Gates. */
@@ -165,8 +171,7 @@ export const gates: Gate[] = [
       { n: "3", text: "≥60% of storytellers complete 20+ stories" },
       { n: "4", text: "Legacy runs on ≤1 engineer's ongoing attention" },
     ],
-    ifNotMet:
-      "Do not start Wave 2. Spend another 6 months on Legacy or kill the company.",
+    ifNotMet: "Do not start Wave 2. Spend another 6 months on Legacy or kill the company.",
     fudgeWarning:
       "Criterion 4 is the one founders fudge. If Legacy still eats the whole team, you do not have a product, you have a job.",
   },
@@ -197,8 +202,16 @@ export const antiDriftRule = {
 export const costComparison: { line: string; relay: string; parallel: string }[] = [
   { line: "Team at month 6", relay: "2–3 people", parallel: "7–9 people" },
   { line: "Team at month 24", relay: "5–7 people", parallel: "12–15 people" },
-  { line: "Capital to 3 products live", relay: "Largely self-funded after M12", parallel: "$1.5–3M up front" },
-  { line: "Distinct brands to fund", relay: "2 (one endorsed pair + 1 isolated)", parallel: "3 full identities" },
+  {
+    line: "Capital to 3 products live",
+    relay: "Largely self-funded after M12",
+    parallel: "$1.5–3M up front",
+  },
+  {
+    line: "Distinct brands to fund",
+    relay: "2 (one endorsed pair + 1 isolated)",
+    parallel: "3 full identities",
+  },
   { line: "Codebases", relay: "1 monorepo, 3 front-ends", parallel: "3 diverging stacks" },
   { line: "Probability all 3 ship", relay: "Moderate", parallel: "Low" },
 ];
@@ -258,7 +271,7 @@ export const documents: DocumentEntry[] = [
 /** Sources cited by the portfolio plan. */
 export const portfolioSources: string[] = [
   "Census of small/new US software firms: follow-on products complete R&D at a rate 45% below plan vs other project types, driven by manpower reallocation under customer pressure (Journal of Small Business Strategy)",
-  "David Cummings on two products in one startup, incl. the \"shared code base\" exception and the recommendation to spin out with a dedicated team",
+  'David Cummings on two products in one startup, incl. the "shared code base" exception and the recommendation to spin out with a dedicated team',
   "Casey Winters on second-product failure modes",
   "EasyBib/EasyResu.me post-mortem: 10 months and $25k lost to a parallel second product",
   "Brand architecture models and risk isolation (Vivaldi, Embark, Inkbot)",

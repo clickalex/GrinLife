@@ -59,7 +59,11 @@ export function Order() {
           </ol>
 
           <div className="flex flex-wrap gap-3">
-            <ButtonLink href="mailto:hello@grinlegacy.example?subject=Start%20a%20Grin%20Legacy%20book" accent="honey" size="lg">
+            <ButtonLink
+              href="mailto:hello@grinlegacy.example?subject=Start%20a%20Grin%20Legacy%20book"
+              accent="honey"
+              size="lg"
+            >
               Email the concierge desk
             </ButtonLink>
             <ButtonLink href="#legacy-pricing" variant="outline" size="lg">

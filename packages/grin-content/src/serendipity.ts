@@ -30,7 +30,7 @@ export const serendipity: Product = {
     heading: "Read this first — it is the whole document",
     body: [
       "This is the easiest product to build and by far the most dangerous to own.",
-      "Omegle ran for 14 years, deployed AI filters and human moderators, cooperated with law enforcement — and still shut down on 8 November 2023. Not for lack of users. In A.M. v. Omegle, a court allowed product-design claims to proceed, treating the pairing mechanism itself as the platform's own conduct rather than third-party content. That crack in the liability shield, plus a settlement, ended a 14-year-old company run by one person who wrote that it was no longer sustainable \"financially nor psychologically.\"",
+      'Omegle ran for 14 years, deployed AI filters and human moderators, cooperated with law enforcement — and still shut down on 8 November 2023. Not for lack of users. In A.M. v. Omegle, a court allowed product-design claims to proceed, treating the pairing mechanism itself as the platform\'s own conduct rather than third-party content. That crack in the liability shield, plus a settlement, ended a 14-year-old company run by one person who wrote that it was no longer sustainable "financially nor psychologically."',
       "You would be building the design the courts just declined to immunize. That is not a reason to never do it — it is a reason to do it last, with money in the bank, with real safety infrastructure, in a separate legal entity, and with the option to walk away intact.",
       "Standing recommendation: if Gate 2 is anything short of a clear pass, skip this product permanently. Nothing else in the portfolio depends on it. A profitable two-product company beats a three-product company in court.",
     ],
@@ -53,8 +53,7 @@ export const serendipity: Product = {
     },
     {
       term: "Core risk",
-      detail:
-        "Legal exposure and moderation cost. Easy to build ≠ cheap to own.",
+      detail: "Legal exposure and moderation cost. Easy to build ≠ cheap to own.",
     },
   ],
   metrics: {
@@ -65,7 +64,7 @@ export const serendipity: Product = {
       { metric: "Classifier recall, red-line categories", values: [">95%", ">98%"] },
       { metric: "Moderation cost / 1,000 chats", values: ["measured", "< revenue/1,000"] },
       { metric: "Users", values: ["5,000 capped", "50,000"] },
-      { metric: "\"Permanent\" rate per chat pair", values: ["measure", ">4%"] },
+      { metric: '"Permanent" rate per chat pair', values: ["measure", ">4%"] },
     ],
   },
   risks: [
@@ -114,7 +113,7 @@ export const serendipity: Product = {
     {
       obligation: "UK / EU exposure",
       detail:
-        "If you accept UK users, the Online Safety Act's \"highly effective age assurance\" applies, with penalties to £18M or 10% of global turnover. Simplest answer: geo-block the UK and EU at launch. Serve India first.",
+        'If you accept UK users, the Online Safety Act\'s "highly effective age assurance" applies, with penalties to £18M or 10% of global turnover. Simplest answer: geo-block the UK and EU at launch. Serve India first.',
     },
     {
       obligation: "Mandated reporting",
@@ -136,26 +135,22 @@ export const nonNegotiables: { original: string; replace: string; why: string }[
   {
     original: "Full anonymity — no signup",
     replace: "Pseudonymity — anonymous to each other, known to you",
-    why:
-      "Users still talk to \"Stranger.\" But every account is verified 18+ behind the scenes, so bad actors are traceable and bannable. Removes the largest single category of risk at almost no cost to the experience.",
+    why: 'Users still talk to "Stranger." But every account is verified 18+ behind the scenes, so bad actors are traceable and bannable. Removes the largest single category of risk at almost no cost to the experience.',
   },
   {
     original: "RAM-only chats — no logs ever",
     replace: "Ephemeral to users — short encrypted safety log",
-    why:
-      "\"No logs\" means no evidence, no actionable reports, no law-enforcement cooperation — exactly the fact pattern regulators call negligent design. And it's incompatible with India's 180-day retention duty for removed content.",
+    why: "\"No logs\" means no evidence, no actionable reports, no law-enforcement cooperation — exactly the fact pattern regulators call negligent design. And it's incompatible with India's 180-day retention duty for removed content.",
   },
   {
     original: "Video roulette",
     replace: "Text only. Voice much later, if ever.",
-    why:
-      "Live video abuse happens in real time and cannot be reviewed after the fact. Text is machine-scannable before delivery. This single choice removes most of Omegle's actual harm surface.",
+    why: "Live video abuse happens in real time and cannot be reviewed after the fact. Text is machine-scannable before delivery. This single choice removes most of Omegle's actual harm surface.",
   },
   {
-    original: "Name \"GrinLuck\"",
-    replace: "\"Serendipity\" — no Grin prefix",
-    why:
-      "Risk isolation is the entire reason to run a separate brand. A shared prefix advertises the family connection in the product name and throws that isolation away for free.",
+    original: 'Name "GrinLuck"',
+    replace: '"Serendipity" — no Grin prefix',
+    why: "Risk isolation is the entire reason to run a separate brand. A shared prefix advertises the family connection in the product name and throws that isolation away for free.",
   },
 ];
 
@@ -169,7 +164,7 @@ export const structure: { item: string; detail: string }[] = [
   {
     item: "No public linkage",
     detail:
-      "Separate domain, separate support, separate social accounts. No \"a Grin company\" footer, no shared founder bios, no cross-promotion, no shared app-store developer account.",
+      'Separate domain, separate support, separate social accounts. No "a Grin company" footer, no shared founder bios, no cross-promotion, no shared app-store developer account.',
   },
   {
     item: "Own insurance",
@@ -205,7 +200,12 @@ export const serendipityPhases: Phase[] = [
       },
     ],
     sprints: [
-      { sprint: "1st", ships: "Age assurance — verified 18+ at signup", reuse: "Inherited from Wave 2", shared: true },
+      {
+        sprint: "1st",
+        ships: "Age assurance — verified 18+ at signup",
+        reuse: "Inherited from Wave 2",
+        shared: true,
+      },
       {
         sprint: "2nd",
         ships: "Real-time text classification before delivery",
@@ -298,7 +298,7 @@ export const serendipityPhases: Phase[] = [
           {
             term: "Paid entry · ₹49 one-time",
             detail:
-              "Best option. A tiny fee is a serious quality filter — it deters throwaway accounts, funds moderation, and creates a payment trail that makes bans stick. Frame it as \"we don't sell your data; this keeps it safe.\"",
+              'Best option. A tiny fee is a serious quality filter — it deters throwaway accounts, funds moderation, and creates a payment trail that makes bans stick. Frame it as "we don\'t sell your data; this keeps it safe."',
           },
           {
             term: "Subscription · ₹99/mo",
@@ -321,11 +321,11 @@ export const serendipityPhases: Phase[] = [
     sprints: [],
     exitCriteria: [
       "Moderation cost per 1,000 chats below revenue per 1,000",
-      "\"Permanent\" rate >4% per chat pair",
+      '"Permanent" rate >4% per chat pair',
       "Zero serious incidents",
     ],
   },
 ];
 
 export const serendipityClosing =
-  "Serendipity is the most emotionally compelling idea of the three. \"Conversation before identity\" is a genuinely good insight, and the mutual-consent Permanent button is the single best mechanic in all the original documents. Build it third, build it small, build it safe, and keep the door open to never building it at all. That option to walk away is worth more than the product.";
+  'Serendipity is the most emotionally compelling idea of the three. "Conversation before identity" is a genuinely good insight, and the mutual-consent Permanent button is the single best mechanic in all the original documents. Build it third, build it small, build it safe, and keep the door open to never building it at all. That option to walk away is worth more than the product.';

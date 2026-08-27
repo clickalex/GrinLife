@@ -7,14 +7,14 @@ monorepo was derived from.
 
 Read in this order. The websites render this content; they do not replace it.
 
-| File | What it is |
-|---|---|
-| `README.html` | Document index. Verdict: build C first, scoring 7.7 vs 4.2 and 3.6. |
-| `Grin-Three-Product-Plan.html` | The portfolio plan: relay vs parallel, shared spine, brand architecture, capital plan, the two kill gates. |
-| `1-Grin-Legacy-Phase-Plan.html` | Wave 1. WhatsApp voice memoirs → hardcover books. Phases 0–3, pricing, completion levers, DPDP. |
-| `2-GrinSocial-Phase-Plan.html` | Wave 2. Feed-free matching, one city at a time. Blocked on Gate 1. IT Rules 2021 duties. |
-| `3-Serendipity-Phase-Plan.html` | Wave 3. Random pseudonymous chat, separate legal entity. Conditional on Gate 2. |
-| `main.pdf` | 203 KB companion PDF of the strategy set. |
+| File                            | What it is                                                                                                 |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `README.html`                   | Document index. Verdict: build C first, scoring 7.7 vs 4.2 and 3.6.                                        |
+| `Grin-Three-Product-Plan.html`  | The portfolio plan: relay vs parallel, shared spine, brand architecture, capital plan, the two kill gates. |
+| `1-Grin-Legacy-Phase-Plan.html` | Wave 1. WhatsApp voice memoirs → hardcover books. Phases 0–3, pricing, completion levers, DPDP.            |
+| `2-GrinSocial-Phase-Plan.html`  | Wave 2. Feed-free matching, one city at a time. Blocked on Gate 1. IT Rules 2021 duties.                   |
+| `3-Serendipity-Phase-Plan.html` | Wave 3. Random pseudonymous chat, separate legal entity. Conditional on Gate 2.                            |
+| `main.pdf`                      | 203 KB companion PDF of the strategy set.                                                                  |
 
 `Grin-Three-Product-Plan 2.html` is a byte-identical duplicate of
 `Grin-Three-Product-Plan.html` (verified with `diff -q`). Left in place so this
@@ -34,19 +34,19 @@ detail second.
 Superseded by the monorepo at the repository root, kept as the only record of the
 four original implementations.
 
-| Archive | Files | Was |
-|---|---|---|
-| `grinlife_roadmap.zip` | 92 | The umbrella "Lantern Trail" roadmap site — one 697-line `Home.tsx` holding all copy and logic |
-| `Grinrex Legacy.zip` | 97 | The Legacy site, 12 section components |
-| `grinsocial-roadmap.zip` | 97 | The GrinSocial site |
-| `grinluck.zip` | 95 | The GrinLuck site |
+| Archive                  | Files | Was                                                                                            |
+| ------------------------ | ----- | ---------------------------------------------------------------------------------------------- |
+| `grinlife_roadmap.zip`   | 92    | The umbrella "Lantern Trail" roadmap site — one 697-line `Home.tsx` holding all copy and logic |
+| `Grinrex Legacy.zip`     | 97    | The Legacy site, 12 section components                                                         |
+| `grinsocial-roadmap.zip` | 97    | The GrinSocial site                                                                            |
+| `grinluck.zip`           | 95    | The GrinLuck site                                                                              |
 
 **Why they are archived rather than maintained.** Measured by md5, **76 files are
 byte-identical across all four archives**, including **53 design-system components
 copied four times** (the four `client/src/components/ui/` directories have the same
 aggregate hash). Fixing one component meant fixing it four times. That is the
 codebase breaking the rule its own portfolio plan depends on: §4 requires a shared
-spine, and §7 costs the portfolio at *"1 monorepo, 3 front-ends"*.
+spine, and §7 costs the portfolio at _"1 monorepo, 3 front-ends"_.
 
 They also cannot be built off-platform: they depend on `vite-plugin-manus-runtime`,
 a `__manus__` debug-log collector, a storage proxy that needs

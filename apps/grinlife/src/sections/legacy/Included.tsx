@@ -29,9 +29,9 @@ const faqs = [
     title: "How long does it take?",
     content: (
       <p>
-        One story a week means roughly seven months, and the book ships at thirty stories. If life interrupts —
-        illness, travel, a bad month — we pause billing and pick up where you left off. We promise the book at
-        twenty stories, not fifty-two: a book in your hands beats a perfect one that never arrives.
+        One story a week means roughly seven months, and the book ships at thirty stories. If life interrupts
+        — illness, travel, a bad month — we pause billing and pick up where you left off. We promise the book
+        at twenty stories, not fifty-two: a book in your hands beats a perfect one that never arrives.
       </p>
     ),
   },
@@ -61,21 +61,19 @@ const faqs = [
 
 export function Included() {
   return (
-      <Section sectionId="included">
-        <div className="space-y-8">
-          <div className="space-y-3">
-            <Eyebrow accent="honey">What's included</Eyebrow>
-            <Heading size="title">The questions people actually ask</Heading>
-            <Lede>
-              If yours is not here, write to us. During Phase 0 the person who answers is the person who will
-              edit your book.
-            </Lede>
-          </div>
-
-          <Accordion items={faqs} accent="honey" exclusive />
+    <Section sectionId="included">
+      <div className="space-y-8">
+        <div className="space-y-3">
+          <Eyebrow accent="honey">What's included</Eyebrow>
+          <Heading size="title">The questions people actually ask</Heading>
+          <Lede>
+            If yours is not here, write to us. During Phase 0 the person who answers is the person who will
+            edit your book.
+          </Lede>
         </div>
-      </Section>
 
-
+        <Accordion items={faqs} accent="honey" exclusive />
+      </div>
+    </Section>
   );
 }

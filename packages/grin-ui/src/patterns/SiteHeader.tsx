@@ -23,7 +23,12 @@ export function SiteHeader({
   tagline?: string;
   links: NavLink[];
   currentPath: string;
-  Link: React.ComponentType<{ href: string; className?: string; children?: React.ReactNode }>;
+  Link: React.ComponentType<{
+    href: string;
+    className?: string;
+    "aria-current"?: "page";
+    children?: React.ReactNode;
+  }>;
   actions?: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
@@ -54,7 +59,14 @@ export function SiteHeader({
       <div className="mx-auto flex max-w-[86rem] items-center gap-4 px-5 py-3 sm:px-8">
         <Link href="/" className="flex min-w-0 items-center gap-2.5">
           <span aria-hidden className="grid h-9 w-9 place-items-center rounded-full bg-coral text-white">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2">
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+            >
               <path d="M12 3v3M5 12H2M22 12h-3M6 6 4 4M18 6l2-2" strokeLinecap="round" />
               <circle cx="12" cy="13" r="5.5" />
             </svg>
@@ -72,6 +84,7 @@ export function SiteHeader({
             <Link
               key={link.href}
               href={link.href}
+              aria-current={isActive(link.href) ? "page" : undefined}
               className={cn(
                 "rounded-full px-3 py-2 text-sm font-bold transition-colors",
                 isActive(link.href) ? "bg-coral-soft text-coral-ink" : "text-ink-soft hover:bg-muted",
@@ -113,6 +126,7 @@ export function SiteHeader({
               <li key={link.href}>
                 <Link
                   href={link.href}
+                  aria-current={isActive(link.href) ? "page" : undefined}
                   className={cn(
                     "block rounded-lg px-4 py-3 text-base font-bold",
                     isActive(link.href) ? "bg-coral-soft text-coral-ink" : "text-ink-soft hover:bg-muted",

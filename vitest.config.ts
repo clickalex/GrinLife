@@ -13,11 +13,7 @@ export default defineConfig({
     environment: "jsdom",
     globals: false,
     setupFiles: ["./vitest.setup.ts"],
-    include: [
-      "packages/*/src/**/*.test.{ts,tsx}",
-      "apps/*/src/**/*.test.{ts,tsx}",
-      "tests/**/*.test.ts",
-    ],
+    include: ["packages/*/src/**/*.test.{ts,tsx}", "apps/*/src/**/*.test.{ts,tsx}", "tests/**/*.test.ts"],
     reporters: ["default"],
   },
 });

@@ -27,7 +27,14 @@ import {
   type CriterionState,
   type GateStatusRecord,
 } from "@grin/content";
-import { applyPatch, fetchGates, resetAllGates, resetGate, type GatePatch, type GatesPayload } from "../lib/gateApi";
+import {
+  applyPatch,
+  fetchGates,
+  resetAllGates,
+  resetGate,
+  type GatePatch,
+  type GatesPayload,
+} from "../lib/gateApi";
 
 export default function Gates() {
   const [local, setLocal] = useLocalStorage<GateStatusRecord>("grinlife:gate-status", {});
@@ -164,8 +171,8 @@ export default function Gates() {
               <Eyebrow>Permission to build</Eyebrow>
               <Heading size="title">Two decisions, all criteria required</Heading>
               <Lede>
-                Each gate is a pass/fail on every criterion at once. A gate that is "mostly met" is a gate that
-                failed — the fudging happens one criterion at a time.
+                Each gate is a pass/fail on every criterion at once. A gate that is "mostly met" is a gate
+                that failed — the fudging happens one criterion at a time.
               </Lede>
             </div>
             <button

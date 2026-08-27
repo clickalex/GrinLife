@@ -1,5 +1,11 @@
 /** Keyboard users skip straight past the header to the page content. */
-export function SkipLink({ target = "#main", label = "Skip to content" }: { target?: string; label?: string }) {
+export function SkipLink({
+  target = "#main",
+  label = "Skip to content",
+}: {
+  target?: string;
+  label?: string;
+}) {
   return (
     <a
       href={target}

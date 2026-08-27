@@ -34,10 +34,7 @@ export function CardHeader({ className, ...props }: ComponentProps<"div">) {
 
 export function CardTitle({ className, ...props }: ComponentProps<"h3">) {
   return (
-    <h3
-      className={cn("font-display text-lg font-bold text-foreground sm:text-xl", className)}
-      {...props}
-    />
+    <h3 className={cn("font-display text-lg font-bold text-foreground sm:text-xl", className)} {...props} />
   );
 }
 

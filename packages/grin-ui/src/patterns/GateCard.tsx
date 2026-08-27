@@ -38,8 +38,8 @@ export function GateCard({
 
       <h3 className="mt-4 font-display text-2xl font-bold text-foreground">{gate.question}</h3>
       <p className="mt-1 text-sm text-ink-soft">
-        Unlocks <strong className="text-foreground">{unlockedProduct}</strong>. All{" "}
-        {gate.criteria.length} must be true — not some.
+        Unlocks <strong className="text-foreground">{unlockedProduct}</strong>. All {gate.criteria.length}{" "}
+        must be true — not some.
       </p>
 
       <ul className="mt-5 space-y-2">

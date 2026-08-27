@@ -23,21 +23,23 @@ export function Overview() {
           </Lede>
 
           <div className="flex flex-wrap gap-2">
-            {["No app to install", "Works on any phone with WhatsApp", "Hindi, English and more"].map((claim) => (
-              <span
-                key={claim}
-                className="inline-flex items-center rounded-full bg-honey-soft px-3.5 py-1.5 text-xs font-bold text-honey-ink"
-              >
-                {claim}
-              </span>
-            ))}
+            {["No app to install", "Works on any phone with WhatsApp", "Hindi, English and more"].map(
+              (claim) => (
+                <span
+                  key={claim}
+                  className="inline-flex items-center rounded-full bg-honey-soft px-3.5 py-1.5 text-xs font-bold text-honey-ink"
+                >
+                  {claim}
+                </span>
+              ),
+            )}
           </div>
 
           <Callout tone="note" label="The part we never automate">
             <p>
-              A human reviews every story before print. Automated transcription is good and dialects are hard —
-              Awadhi and Bhojpuri especially — so we would rather spend an editor's hour than ship a paragraph
-              your family has to correct for the rest of their lives.
+              A human reviews every story before print. Automated transcription is good and dialects are hard
+              — Awadhi and Bhojpuri especially — so we would rather spend an editor's hour than ship a
+              paragraph your family has to correct for the rest of their lives.
             </p>
           </Callout>
         </div>
@@ -105,9 +107,9 @@ export function Overview() {
 
       <Container size="wide" className="mt-10 px-0">
         <p className="text-xs leading-relaxed text-muted-foreground">
-          Below the story is the plan that builds it: four phases, each with an exit criterion, the pricing, the
-          metrics the gate decision uses, the risks and the compliance obligations. Both halves come from the
-          same content layer.
+          Below the story is the plan that builds it: four phases, each with an exit criterion, the pricing,
+          the metrics the gate decision uses, the risks and the compliance obligations. Both halves come from
+          the same content layer.
         </p>
       </Container>
     </Section>

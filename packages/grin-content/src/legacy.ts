@@ -102,7 +102,7 @@ export const legacy: Product = {
     {
       obligation: "Children's data",
       detail:
-        "A \"child\" is anyone under 18 and requires verifiable parental consent. Family archives contain grandchildren — so gate any under-18 contributor behind a parent account. Simplest v1 answer: contributors must be 18+.",
+        'A "child" is anyone under 18 and requires verifiable parental consent. Family archives contain grandchildren — so gate any under-18 contributor behind a parent account. Simplest v1 answer: contributors must be 18+.',
     },
     {
       obligation: "Deceased persons",
@@ -131,7 +131,8 @@ export const legacyPhases: Phase[] = [
     label: "Phase 0",
     window: "Weeks 1–3",
     title: "Sell it before you build it",
-    kidWords: "Before we build anything, we ask real families whether they want it — and whether they will pay.",
+    kidWords:
+      "Before we build anything, we ask real families whether they want it — and whether they will pay.",
     summary:
       "Zero code. The goal is a signed rupee, not a working product. If you cannot sell this manually to warm contacts, no amount of engineering fixes it.",
     blocks: [
@@ -158,7 +159,7 @@ export const legacyPhases: Phase[] = [
           {
             term: "Prompt library v1",
             detail:
-              "52 questions, culturally specific. Not \"describe your childhood\" but \"What did your mother cook on festival days, and who helped her?\"",
+              '52 questions, culturally specific. Not "describe your childhood" but "What did your mother cook on festival days, and who helped her?"',
           },
         ],
       },
@@ -180,7 +181,8 @@ export const legacyPhases: Phase[] = [
     label: "Phase 1",
     window: "Months 1–6",
     title: "Automate only what hurt",
-    kidWords: "Now we build the machines for the boring parts — and the parts every later product will need too.",
+    kidWords:
+      "Now we build the machines for the boring parts — and the parts every later product will need too.",
     summary:
       "You now know exactly which manual steps consumed your time. Automate those and nothing else. This phase also builds the shared spine that Waves 2 and 3 inherit.",
     blocks: [
@@ -213,8 +215,18 @@ export const legacyPhases: Phase[] = [
       },
     ],
     sprints: [
-      { sprint: "M1", ships: "WhatsApp Business API + scheduled prompt engine", reuse: "Messaging layer", shared: true },
-      { sprint: "M2", ships: "Voice ingest, storage, Whisper transcription", reuse: "Media pipeline", shared: true },
+      {
+        sprint: "M1",
+        ships: "WhatsApp Business API + scheduled prompt engine",
+        reuse: "Messaging layer",
+        shared: true,
+      },
+      {
+        sprint: "M2",
+        ships: "Voice ingest, storage, Whisper transcription",
+        reuse: "Media pipeline",
+        shared: true,
+      },
       { sprint: "M3", ships: "LLM prose shaping + human review queue", reuse: "Legacy-only", shared: false },
       {
         sprint: "M4",
@@ -222,8 +234,18 @@ export const legacyPhases: Phase[] = [
         reuse: "Identity + consent engine",
         shared: true,
       },
-      { sprint: "M5", ships: "Book layout engine → print-ready PDF + QR audio links", reuse: "Legacy-only", shared: false },
-      { sprint: "M6", ships: "Billing, subscriptions, refunds, print partner integration", reuse: "Billing", shared: true },
+      {
+        sprint: "M5",
+        ships: "Book layout engine → print-ready PDF + QR audio links",
+        reuse: "Legacy-only",
+        shared: false,
+      },
+      {
+        sprint: "M6",
+        ships: "Billing, subscriptions, refunds, print partner integration",
+        reuse: "Billing",
+        shared: true,
+      },
     ],
     exitCriteria: [
       "75+ paying customers",
@@ -276,7 +298,8 @@ export const legacyPhases: Phase[] = [
           },
           {
             term: "Partnerships",
-            detail: "Senior-living communities, wealth advisors, hospices, ancestry groups. Slow but high-trust.",
+            detail:
+              "Senior-living communities, wealth advisors, hospices, ancestry groups. Slow but high-trust.",
           },
         ],
       },
@@ -300,17 +323,14 @@ export const legacyPhases: Phase[] = [
         heading: "Still cut — do not revisit before month 30",
         items: [
           "Blockchain provenance.",
-          "\"Perpetual\" storage promises.",
+          '"Perpetual" storage promises.',
           "Engraved drives and memory capsules.",
           "AI persona chatbots of deceased relatives — an ethical minefield that terrifies exactly the demographic you're selling to, and would poison the trust the rest of the product depends on.",
         ],
       },
     ],
     sprints: [],
-    exitCriteria: [
-      "Add-on attach rate tracked per tier",
-      "No cut feature reintroduced before month 30",
-    ],
+    exitCriteria: ["Add-on attach rate tracked per tier", "No cut feature reintroduced before month 30"],
   },
 ];
 
@@ -340,9 +360,13 @@ export const legacyAddOns: { name: string; price: string; note: string }[] = [
   {
     name: "Family Vault",
     price: "₹1,999/yr",
-    note: "Photos, documents, video. 10-year terms, not \"forever.\" Free full export always available.",
+    note: 'Photos, documents, video. 10-year terms, not "forever." Free full export always available.',
   },
-  { name: "Additional volumes", price: "₹4,999", note: "Year two of prompts → volume II. Natural renewal path." },
+  {
+    name: "Additional volumes",
+    price: "₹4,999",
+    note: "Year two of prompts → volume II. Natural renewal path.",
+  },
   {
     name: "Voice preservation",
     price: "₹2,999",

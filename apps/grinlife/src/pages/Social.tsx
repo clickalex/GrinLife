@@ -36,9 +36,9 @@ export default function Social() {
       afterCompliance={
         <Callout tone="note" label="How to judge this product">
           <p>
-            GrinSocial will likely be the least profitable of the three for a long time. Its strategic value is
-            that it builds the matching engine, moderation tooling and age assurance that Wave 3 inherits — and
-            it creates a large top-of-funnel that Legacy can sell into. Judge it on retention and
+            GrinSocial will likely be the least profitable of the three for a long time. Its strategic value
+            is that it builds the matching engine, moderation tooling and age assurance that Wave 3 inherits —
+            and it creates a large top-of-funnel that Legacy can sell into. Judge it on retention and
             infrastructure, not on early revenue.
           </p>
         </Callout>

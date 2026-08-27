@@ -115,6 +115,69 @@ export const routes: string[] = ["/", "/roadmap", "/gates", "/spine", "/docs", "
   products.map((p) => p.route),
 );
 
+/** `<title>` and meta description for one route. */
+export interface PageMeta {
+  title: string;
+  description: string;
+}
+
+/**
+ * Per-route document metadata.
+ *
+ * One site now carries eight routes. A single `<title>` in `index.html` would make
+ * every tab, bookmark and search result say the same thing, so the head is data
+ * like everything else — and it lives next to `routes` so the two cannot drift.
+ */
+const staticPageMeta: Record<string, PageMeta> = {
+  "/": {
+    title: "Three products, run as a relay",
+    description:
+      "Grin Legacy, GrinSocial and Serendipity — one shared spine, two kill gates and a 36-month relay instead of a race.",
+  },
+  "/roadmap": {
+    title: "The 36-month relay",
+    description:
+      "Wave by wave: what gets built, what each wave hands the next, and the fork that decides whether GrinSocial and Serendipity happen at all.",
+  },
+  "/gates": {
+    title: "The two kill gates",
+    description:
+      "Gate 1 and Gate 2, measured. Every criterion takes a real number and the verdict only clears when all of them are met.",
+  },
+  "/spine": {
+    title: "The shared spine",
+    description:
+      "The one monorepo behind every product: what each service owns, and why a new front-end inherits it instead of copying it.",
+  },
+  "/docs": {
+    title: "Source documents",
+    description:
+      "The documents this site is transcribed from, with the duplication audit of the archives they replaced.",
+  },
+  "/404": {
+    title: "This stop does not exist",
+    description: "That trail stop is not on the map.",
+  },
+};
+
+export const pageMeta: Record<string, PageMeta> = {
+  ...staticPageMeta,
+  ...Object.fromEntries(
+    products.map((product) => [product.route, { title: product.name, description: product.pitch }]),
+  ),
+};
+
+/** Document title for a path; unknown paths get the 404 wording rather than a blank tab. */
+export function pageTitleFor(path: string): string {
+  const meta = pageMeta[path] ?? pageMeta["/404"]!;
+  return `${meta.title} · ${portfolio.name}`;
+}
+
+/** Meta description for a path. */
+export function pageDescriptionFor(path: string): string {
+  return (pageMeta[path] ?? pageMeta["/404"]!).description;
+}
+
 /**
  * How this repository implements the portfolio's own §4 "shared spine" rule.
  * The plan demands "1 monorepo, 3 front-ends"; these are the code-level equivalents.

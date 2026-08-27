@@ -132,9 +132,7 @@ export default function Home() {
               <div className="space-y-3">
                 <Eyebrow>§1 — The fork</Eyebrow>
                 <Heading size="title">Two ways to run three products</Heading>
-                <Lede>
-                  Only one of these survives contact with the first paying customer.
-                </Lede>
+                <Lede>Only one of these survives contact with the first paying customer.</Lede>
               </div>
 
               <div className="grid gap-5 lg:grid-cols-2">
@@ -144,13 +142,22 @@ export default function Home() {
                 ].map(({ model, accent }) => {
                   const a = accentOf(accent);
                   return (
-                    <Card key={model.name} accent={accent} className={cn("p-6", model === fork.relay && "ring-2", model === fork.relay && a.ring)}>
+                    <Card
+                      key={model.name}
+                      accent={accent}
+                      className={cn("p-6", model === fork.relay && "ring-2", model === fork.relay && a.ring)}
+                    >
                       <p className={cn("grin-label", a.text)}>{model.name}</p>
-                      <h3 className="mt-2 font-display text-xl font-bold text-foreground">{model.subtitle}</h3>
+                      <h3 className="mt-2 font-display text-xl font-bold text-foreground">
+                        {model.subtitle}
+                      </h3>
                       <ul className="mt-4 space-y-2.5">
                         {model.points.map((point) => (
                           <li key={point} className="flex gap-3 text-sm leading-relaxed text-ink-soft">
-                            <span aria-hidden className={cn("mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full", a.dot)} />
+                            <span
+                              aria-hidden
+                              className={cn("mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full", a.dot)}
+                            />
                             <span>{point}</span>
                           </li>
                         ))}
@@ -171,8 +178,8 @@ export default function Home() {
                 <Eyebrow>§3 — Timeline</Eyebrow>
                 <Heading size="title">The 36-month relay</Heading>
                 <Lede>
-                  Note the overlap pattern: tracks overlap in market, never in build. That single constraint is
-                  what turns three products from a liability into a portfolio.
+                  Note the overlap pattern: tracks overlap in market, never in build. That single constraint
+                  is what turns three products from a liability into a portfolio.
                 </Lede>
               </div>
               <RelayChart />
@@ -215,7 +222,10 @@ export default function Home() {
                   <Link
                     key="p"
                     href={product.route}
-                    className={cn("font-bold underline-offset-4 hover:underline", accentOf(product.accent).text)}
+                    className={cn(
+                      "font-bold underline-offset-4 hover:underline",
+                      accentOf(product.accent).text,
+                    )}
                   >
                     {product.name}
                   </Link>,

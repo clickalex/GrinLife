@@ -12,7 +12,7 @@ import { Callout, Card, Eyebrow, Heading, Lede, Section, StatGrid, accentOf, cn 
 const contrasts = [
   { them: "Full anonymity, no signup", us: "Pseudonymous — unknown to each other, known to us" },
   { them: "Video roulette", us: "Text only — no camera, no photo, no voice" },
-  { them: "\"No logs, ever\"", us: "Ephemeral to you; a short encrypted safety log for us" },
+  { them: '"No logs, ever"', us: "Ephemeral to you; a short encrypted safety log for us" },
   { them: "Free at any scale", us: "Paid entry, and growth capped to what we can moderate" },
 ];
 
@@ -96,7 +96,8 @@ export function Overview() {
                 </span>
               </div>
               <p className="pt-1 text-center text-xs text-muted-foreground">
-                Illustrative. If only one person presses it, nothing is saved and neither learns who pressed it.
+                Illustrative. If only one person presses it, nothing is saved and neither learns who pressed
+                it.
               </p>
             </div>
           </Card>

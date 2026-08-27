@@ -28,10 +28,10 @@ export function Overview() {
               who match. There is nothing to scroll and nothing to perform.
             </Lede>
             <p className="max-w-xl text-[0.97rem] leading-relaxed text-ink-soft">
-              Every feed app measures success by how long you stay. A friendship app that does that will always
-              show you more content instead of more people, because content is cheaper. So when you have had
-              your introductions, this app has nothing left to show you. That is not a limitation we failed to
-              solve — it is the product working.
+              Every feed app measures success by how long you stay. A friendship app that does that will
+              always show you more content instead of more people, because content is cheaper. So when you
+              have had your introductions, this app has nothing left to show you. That is not a limitation we
+              failed to solve — it is the product working.
             </p>
             <Callout tone="note" label="Why you cannot sign up yet">
               <p>

@@ -70,12 +70,19 @@ export function Tabs({
               onClick={() => setActive(item.id)}
               className={cn(
                 "flex-1 rounded-full px-4 py-2 text-sm font-bold transition-all duration-200",
-                selected ? cn(a.bg, "text-white shadow-[var(--shadow-lantern)]") : "text-ink-soft hover:bg-muted",
+                selected
+                  ? cn(a.bg, "text-white shadow-[var(--shadow-lantern)]")
+                  : "text-ink-soft hover:bg-muted",
               )}
             >
               {item.label}
               {item.caption ? (
-                <span className={cn("hidden text-xs font-semibold sm:block", selected ? "opacity-90" : "opacity-70")}>
+                <span
+                  className={cn(
+                    "hidden text-xs font-semibold sm:block",
+                    selected ? "opacity-90" : "opacity-70",
+                  )}
+                >
                   {item.caption}
                 </span>
               ) : null}

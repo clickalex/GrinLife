@@ -1,24 +1,13 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "types": [
-      "node",
-      "vite/client"
-    ],
+    "types": ["node", "vite/client"],
     "baseUrl": ".",
     "paths": {
-      "@grin/ui": [
-        "./packages/grin-ui/src/index.ts"
-      ],
-      "@grin/ui/*": [
-        "./packages/grin-ui/src/*"
-      ],
-      "@grin/api": [
-        "./packages/grin-api/src/index.ts"
-      ],
-      "@grin/content": [
-        "./packages/grin-content/src/index.ts"
-      ]
+      "@grin/ui": ["./packages/grin-ui/src/index.ts"],
+      "@grin/ui/*": ["./packages/grin-ui/src/*"],
+      "@grin/api": ["./packages/grin-api/src/index.ts"],
+      "@grin/content": ["./packages/grin-content/src/index.ts"]
     }
   },
   "include": [
@@ -32,9 +21,5 @@
     "vitest.config.ts",
     "vitest.setup.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "Demo"
-  ]
+  "exclude": ["node_modules", "dist", "Demo"]
 }

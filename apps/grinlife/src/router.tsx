@@ -11,13 +11,16 @@ export function Link({
   href,
   className,
   children,
+  "aria-current": ariaCurrent,
 }: {
   href: string;
   className?: string;
   children?: React.ReactNode;
+  /** Set by `@grin/ui` chrome to mark the active trail stop for assistive tech. */
+  "aria-current"?: "page";
 }) {
   return (
-    <WouterLink href={href} className={className}>
+    <WouterLink href={href} className={className} aria-current={ariaCurrent}>
       {children}
     </WouterLink>
   );

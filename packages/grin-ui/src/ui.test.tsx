@@ -29,7 +29,15 @@ import {
   spineRows,
 } from "@grin/content";
 
-function TestLink({ href, className, children }: { href: string; className?: string; children?: React.ReactNode }) {
+function TestLink({
+  href,
+  className,
+  children,
+}: {
+  href: string;
+  className?: string;
+  children?: React.ReactNode;
+}) {
   return (
     <a href={href} className={className}>
       {children}
@@ -100,7 +108,10 @@ describe("DualView", () => {
     render(
       <DualViewProvider storageKey="test:view" initial="child">
         <DualViewToggle />
-        <DualView child="We build the locks first." parent={<p>Ship identity, consent and audit before features.</p>} />
+        <DualView
+          child="We build the locks first."
+          parent={<p>Ship identity, consent and audit before features.</p>}
+        />
       </DualViewProvider>,
     );
 

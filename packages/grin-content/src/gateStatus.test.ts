@@ -16,8 +16,22 @@ import {
   type GateStatusRecord,
 } from "./index";
 
-const numeric = { n: "1", label: "Customers", kind: "numeric" as const, target: 250, unit: "customers", direction: "at-least" as const };
-const ceiling = { n: "4", label: "Engineers", kind: "numeric" as const, target: 1, unit: "engineers", direction: "at-most" as const };
+const numeric = {
+  n: "1",
+  label: "Customers",
+  kind: "numeric" as const,
+  target: 250,
+  unit: "customers",
+  direction: "at-least" as const,
+};
+const ceiling = {
+  n: "4",
+  label: "Engineers",
+  kind: "numeric" as const,
+  target: 1,
+  unit: "engineers",
+  direction: "at-most" as const,
+};
 const yesno = { n: "1", label: "Legal opinion", kind: "boolean" as const };
 
 describe("evaluateCriterion", () => {

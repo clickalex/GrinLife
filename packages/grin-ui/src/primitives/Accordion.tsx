@@ -55,7 +55,9 @@ export function Accordion({
               )}
             >
               <span className="flex min-w-0 flex-col gap-1">
-                <span className="font-display text-base font-bold text-foreground sm:text-lg">{item.title}</span>
+                <span className="font-display text-base font-bold text-foreground sm:text-lg">
+                  {item.title}
+                </span>
                 {item.meta ? <span className="text-xs text-muted-foreground">{item.meta}</span> : null}
               </span>
               <span

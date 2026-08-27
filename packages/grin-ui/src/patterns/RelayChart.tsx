@@ -44,7 +44,11 @@ export function RelayChart({
                 Track
               </th>
               {columns.map((column) => (
-                <th key={column} scope="col" className="grin-label px-2 py-3 text-center text-muted-foreground">
+                <th
+                  key={column}
+                  scope="col"
+                  className="grin-label px-2 py-3 text-center text-muted-foreground"
+                >
                   {column}
                 </th>
               ))}
@@ -87,7 +91,10 @@ export function RelayChart({
 
       <figcaption className="flex flex-wrap items-center gap-x-5 gap-y-2">
         {legend.map((entry) => (
-          <span key={entry.state} className="inline-flex items-center gap-2 text-xs font-semibold text-ink-soft">
+          <span
+            key={entry.state}
+            className="inline-flex items-center gap-2 text-xs font-semibold text-ink-soft"
+          >
             <span
               aria-hidden
               className={cn(

@@ -2,17 +2,7 @@
  * The source documents. This site is a rendering of these five files, not a
  * replacement for them — so every entry links back to the original in `Demo/DOCS/`.
  */
-import {
-  Callout,
-  Card,
-  Eyebrow,
-  Heading,
-  Lede,
-  PageHero,
-  Section,
-  accentOf,
-  cn,
-} from "@grin/ui";
+import { Callout, Card, Eyebrow, Heading, Lede, PageHero, Section, accentOf, cn } from "@grin/ui";
 import { documents, portfolioSources } from "@grin/content";
 
 const kindAccent = (kind: string) => {

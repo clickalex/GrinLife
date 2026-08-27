@@ -29,7 +29,11 @@ function variants(variant: ButtonVariant, accent: Accent) {
   }
 }
 
-export function buttonStyles(variant: ButtonVariant = "primary", size: ButtonSize = "md", accent: Accent = "coral") {
+export function buttonStyles(
+  variant: ButtonVariant = "primary",
+  size: ButtonSize = "md",
+  accent: Accent = "coral",
+) {
   return cn(base, sizes[size], variants(variant, accent));
 }
 
@@ -39,7 +43,13 @@ type ButtonProps = ComponentProps<"button"> & {
   accent?: Accent;
 };
 
-export function Button({ variant = "primary", size = "md", accent = "coral", className, ...props }: ButtonProps) {
+export function Button({
+  variant = "primary",
+  size = "md",
+  accent = "coral",
+  className,
+  ...props
+}: ButtonProps) {
   return <button className={cn(buttonStyles(variant, size, accent), className)} {...props} />;
 }
 

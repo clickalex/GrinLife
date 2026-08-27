@@ -7,8 +7,9 @@ import {
   SiteFooter,
   SiteHeader,
   SkipLink,
+  useDocumentHead,
 } from "@grin/ui";
-import { portfolio, primaryNav } from "@grin/content";
+import { pageDescriptionFor, pageTitleFor, portfolio, primaryNav } from "@grin/content";
 import { Link, usePath } from "./router";
 import Home from "./pages/Home";
 import Roadmap from "./pages/Roadmap";
@@ -56,6 +57,9 @@ function ScrollToTop() {
 export default function App() {
   const path = usePath();
 
+  // Eight routes share one HTML shell; the head has to follow the router.
+  useDocumentHead({ title: pageTitleFor(path), description: pageDescriptionFor(path) });
+
   return (
     <ErrorBoundary>
       <DualViewProvider>
@@ -89,7 +93,7 @@ export default function App() {
           brand={portfolio.name}
           blurb={portfolio.brandEssence}
           columns={footerColumns}
-          legal={`Grin portfolio plan · ${portfolio.documentDate} · Serendipity is a separate legal entity with no public affiliation to Grin.`}
+          legal={`Grin portfolio plan · ${portfolio.documentDate} · Serendipity is planned as a separate legal entity with its own brand; its plan is published here as part of this portfolio.`}
           Link={Link}
         />
       </DualViewProvider>

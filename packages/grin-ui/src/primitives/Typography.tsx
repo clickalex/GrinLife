@@ -34,20 +34,14 @@ const headingSizes = {
 export function Heading({ as = "h2", size = "title", className, ...props }: HeadingProps) {
   const Tag = as;
   return (
-    <Tag
-      className={cn("font-display font-bold text-foreground", headingSizes[size], className)}
-      {...props}
-    />
+    <Tag className={cn("font-display font-bold text-foreground", headingSizes[size], className)} {...props} />
   );
 }
 
 /** Long-form paragraph with a comfortable measure. */
 export function Lede({ className, ...props }: ComponentProps<"p">) {
   return (
-    <p
-      className={cn("max-w-3xl text-lg leading-relaxed text-ink-soft sm:text-xl", className)}
-      {...props}
-    />
+    <p className={cn("max-w-3xl text-lg leading-relaxed text-ink-soft sm:text-xl", className)} {...props} />
   );
 }
 

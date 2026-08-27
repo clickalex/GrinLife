@@ -83,10 +83,7 @@ export function SectionChips({ items, className }: { items: ChapterItem[]; class
   const active = useScrollSpy(items.map((item) => item.id));
 
   return (
-    <nav
-      aria-label="Trail stops"
-      className={cn("-mx-5 overflow-x-auto px-5 pb-2 xl:hidden", className)}
-    >
+    <nav aria-label="Trail stops" className={cn("-mx-5 overflow-x-auto px-5 pb-2 xl:hidden", className)}>
       <ul className="flex w-max gap-2">
         {items.map((item, index) => {
           const isActive = item.id === active;

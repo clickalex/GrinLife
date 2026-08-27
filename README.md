@@ -26,22 +26,24 @@ Checks:
 
 ```bash
 npm run typecheck  # tsc --noEmit across every package and the app
-npm test           # 93 tests: content, gate logic, API, components, routes, source scanning
-npm run verify     # typecheck + test + build
+npm test           # 194 tests: content, gate logic, API, components, routes, site audit
+npm run audit      # 100 checks over the repo, the build, the live server and the content model
+npm run audit:md   # the same 100 checks, written to AUDIT.md
+npm run verify     # typecheck + test + build + audit
 ```
 
 One site, eight routes:
 
-| Route | What it is |
-| --- | --- |
-| `/` | The portfolio argument and the three doors |
-| `/products/legacy` | Grin Legacy — the case for the product, then its plan |
-| `/products/social` | GrinSocial — the case for the product, then its plan |
+| Route                   | What it is                                            |
+| ----------------------- | ----------------------------------------------------- |
+| `/`                     | The portfolio argument and the three doors            |
+| `/products/legacy`      | Grin Legacy — the case for the product, then its plan |
+| `/products/social`      | GrinSocial — the case for the product, then its plan  |
 | `/products/serendipity` | Serendipity — the case for the product, then its plan |
-| `/roadmap` | The relay: waves, gates, the fork, anti-drift |
-| `/gates` | Live gate measurement against the status API |
-| `/spine` | The codebase spine — who owns which file |
-| `/docs` | The source documents |
+| `/roadmap`              | The relay: waves, gates, the fork, anti-drift         |
+| `/gates`                | Live gate measurement against the status API          |
+| `/spine`                | The codebase spine — who owns which file              |
+| `/docs`                 | The source documents                                  |
 
 ## Layout
 
@@ -65,12 +67,12 @@ tests/                    monorepo-wide checks
 
 ## The rule this codebase follows
 
-The portfolio plan requires it in §4 and §7: *"micro-apps are fine as long as they share the
-same code base"*, and *"Codebases: 1 monorepo, 3 front-ends."*
+The portfolio plan requires it in §4 and §7: _"micro-apps are fine as long as they share the
+same code base"_, and _"Codebases: 1 monorepo, 3 front-ends."_
 
 So **no route contains a component of its own.** Everything imports `@grin/ui` and
-`@grin/content` and composes them — 55 package source files carry the design system, the
-content and the gate logic; 28 app source files carry composition. `ProductSite` renders an
+`@grin/content` and composes them — 56 package source files carry the design system, the
+content and the gate logic; 29 app source files carry composition. `ProductSite` renders an
 entire multi-section product website from one `Product` record, so adding a product means
 adding data, a `sections/<product>/` folder and a route.
 
@@ -105,6 +107,28 @@ What is still enforceable is asserted against the rendered DOM in
 and the rename row from the plan is never published on any page. If the quarantine has to be
 restored for real, `ProductSite`'s `landing` prop makes the split reversible — move
 `sections/serendipity/` into its own app and the same components ship under the other brand.
+
+## The audit
+
+`npm run audit` runs one hundred numbered checks and prints what each one observed:
+
+| Group                 | What it covers                                                                                                                     |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| A. Repository hygiene | one app, three packages, nothing built or generated is tracked, no reference to the deleted apps, the lockfile resolves            |
+| B. Source quality     | no `any`, no suppressed type errors, no skipped tests, no `eval`, no dead files, Prettier clean                                    |
+| C. Types and tests    | `tsc`, the full suite, every package covered, every `it()` asserts, every route reachable                                          |
+| D. Build              | builds, the design system survives Tailwind's purge, all three products are in the bundle, no source maps                          |
+| E. Content model      | phases contiguous, no empty fields, gates have the plan's criteria, every document resolves, every route has metadata              |
+| F. Reuse              | no component re-implemented, packages never import upward, the design system has no router, the compliance table is published once |
+| G. Live server        | boots the real production build, 8 routes 200, unknown paths 404, the full gate round-trip, malformed input cannot crash it        |
+| H. Security           | `npm audit` clean, no secrets, atomic writes, no path disclosure, one external origin                                              |
+
+`AUDIT.md` is the last run. The audit found six behavioural defects and three hygiene
+items, all fixed — `ROADMAP.md` Part 4 records each one and why it mattered.
+
+Two things to know before running it elsewhere: it needs a git checkout (it enumerates
+tracked files with `git ls-files`), and it boots its own production server on `:4321` with a
+throwaway data file, so it never touches your recorded gate measurements.
 
 ## Content fidelity
 

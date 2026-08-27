@@ -30,12 +30,7 @@ export function Callout({ tone = "note", label, title, className, children, ...p
   return (
     <div
       role={tone === "warning" || tone === "kill" ? "note" : undefined}
-      className={cn(
-        "rounded-lg border-l-4 p-5 sm:p-6",
-        a.bgSoft,
-        a.border,
-        className,
-      )}
+      className={cn("rounded-lg border-l-4 p-5 sm:p-6", a.bgSoft, a.border, className)}
       {...props}
     >
       <p className={cn("grin-label mb-2 flex items-center gap-2 font-bold", a.text)}>

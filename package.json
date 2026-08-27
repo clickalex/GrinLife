@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "license": "MIT",
-  "description": "GrinLife \u2014 one shared spine, two front-ends, three product roadmaps.",
+  "description": "GrinLife \u2014 one website for three products, built on one shared spine.",
   "workspaces": [
     "packages/*",
     "apps/*"
@@ -18,7 +18,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "format": "prettier --write .",
-    "verify": "npm run typecheck && npm test && npm run build"
+    "verify": "npm run typecheck && npm test && npm run build && npm run audit -- --quiet",
+    "audit": "node scripts/audit.mjs",
+    "audit:md": "node scripts/audit.mjs --md"
   },
   "devDependencies": {
     "@testing-library/react": "^16.3.0",

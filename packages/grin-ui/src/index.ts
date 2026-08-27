@@ -19,6 +19,7 @@ export { useLocalStorage } from "./hooks/useLocalStorage";
 export { useMediaQuery } from "./hooks/useMediaQuery";
 export { useScrollSpy } from "./hooks/useScrollSpy";
 export { useInView } from "./hooks/useInView";
+export { useDocumentHead } from "./hooks/useDocumentHead";
 
 // primitives
 export { Container } from "./primitives/Container";

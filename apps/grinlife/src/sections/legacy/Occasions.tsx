@@ -2,11 +2,20 @@ import { Callout, Eyebrow, Heading, Lede, Section, accentOf, cn } from "@grin/ui
 
 const occasions = [
   { title: "A 60th, 70th, 75th or 80th", body: "The birthdays where the person says they want nothing." },
-  { title: "Diwali", body: "The one week the whole family is in the same house, and the stories come out anyway." },
+  {
+    title: "Diwali",
+    body: "The one week the whole family is in the same house, and the stories come out anyway.",
+  },
   { title: "Retirement", body: "Forty years of work and no record of any of it." },
-  { title: "A grandchild's birth", body: "The moment a parent starts wondering what the child will remember." },
+  {
+    title: "A grandchild's birth",
+    body: "The moment a parent starts wondering what the child will remember.",
+  },
   { title: "A diagnosis", body: "Some families start here. We handle those with care and no deadlines." },
-  { title: "Visiting from abroad", body: "You are home for ten days. Start the book while you are still in the same time zone." },
+  {
+    title: "Visiting from abroad",
+    body: "You are home for ten days. Start the book while you are still in the same time zone.",
+  },
 ];
 
 export function Occasions() {

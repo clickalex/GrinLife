@@ -2,7 +2,10 @@ import { spineRows as defaultRows, type SpineRow } from "@grin/content";
 import { cn } from "../lib/cn";
 
 const Yes = () => (
-  <span className="inline-grid h-6 w-6 place-items-center rounded-full bg-moss-soft text-moss-ink" title="Yes">
+  <span
+    className="inline-grid h-6 w-6 place-items-center rounded-full bg-moss-soft text-moss-ink"
+    title="Yes"
+  >
     <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="3.2">
       <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
@@ -11,7 +14,10 @@ const Yes = () => (
 );
 
 const No = () => (
-  <span className="inline-grid h-6 w-6 place-items-center rounded-full bg-muted text-muted-foreground" title="No">
+  <span
+    className="inline-grid h-6 w-6 place-items-center rounded-full bg-muted text-muted-foreground"
+    title="No"
+  >
     <span aria-hidden className="text-sm leading-none">
       –
     </span>
@@ -36,7 +42,8 @@ export function SpineMatrix({
   columns?: { key: "legacy" | "social" | "luck"; label: string; hint: string }[];
   className?: string;
 }) {
-  const waveCount = (builtIn: string) => (builtIn.startsWith("Wave 1") ? 1 : builtIn.startsWith("Wave 2") ? 2 : 3);
+  const waveCount = (builtIn: string) =>
+    builtIn.startsWith("Wave 1") ? 1 : builtIn.startsWith("Wave 2") ? 2 : 3;
 
   return (
     <div className={cn("overflow-x-auto rounded-lg border border-border bg-card", className)}>

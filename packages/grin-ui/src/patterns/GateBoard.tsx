@@ -153,7 +153,9 @@ export function GateBoard({
                   onClick={() => onConfirm(input.n, state?.confirmed !== true)}
                   className={cn(
                     "rounded-full border px-4 py-1.5 text-xs font-bold transition-colors",
-                    state?.confirmed ? cn(a.bg, "border-transparent text-white") : "border-border text-ink-soft",
+                    state?.confirmed
+                      ? cn(a.bg, "border-transparent text-white")
+                      : "border-border text-ink-soft",
                   )}
                 >
                   {state?.confirmed ? "Confirmed" : "Not yet"}

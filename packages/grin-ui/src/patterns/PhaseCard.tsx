@@ -40,7 +40,12 @@ export function PhaseCard({
     <Card
       id={phase.id}
       accent={tone}
-      className={cn("scroll-mt-28 p-5 sm:p-7", explored && "ring-1 ring-inset", explored && a.ring, className)}
+      className={cn(
+        "scroll-mt-28 p-5 sm:p-7",
+        explored && "ring-1 ring-inset",
+        explored && a.ring,
+        className,
+      )}
     >
       <div className="flex items-start gap-4">
         <Lantern n={phase.index + 1} accent={tone} size={48} label={`${phase.label} lantern`} />
@@ -57,7 +62,9 @@ export function PhaseCard({
                 onClick={() => onExplored(phase.id)}
                 className={cn(
                   "grin-label ml-auto rounded-full border px-3 py-1 transition-colors",
-                  explored ? cn(a.bgSoft, a.text, a.border) : "border-border text-muted-foreground hover:bg-muted",
+                  explored
+                    ? cn(a.bgSoft, a.text, a.border)
+                    : "border-border text-muted-foreground hover:bg-muted",
                 )}
               >
                 {explored ? "Explored ✓" : "Mark explored"}
@@ -126,7 +133,11 @@ export function PhaseCard({
             {phase.exitCriteria.map((criterion) => (
               <li
                 key={criterion}
-                className={cn("flex items-start gap-2 rounded-lg p-3 text-sm leading-relaxed", a.bgSoft, a.text)}
+                className={cn(
+                  "flex items-start gap-2 rounded-lg p-3 text-sm leading-relaxed",
+                  a.bgSoft,
+                  a.text,
+                )}
               >
                 <span aria-hidden className="mt-0.5 font-bold">
                   →

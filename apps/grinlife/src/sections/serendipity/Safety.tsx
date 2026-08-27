@@ -1,12 +1,4 @@
-import {
-  Callout,
-  Card,
-  DataTable,
-  Eyebrow,
-  Heading,
-  Lede,
-  Section,
-} from "@grin/ui";
+import { Callout, Card, DataTable, Eyebrow, Heading, Lede, Section } from "@grin/ui";
 import { nonNegotiables } from "@grin/content";
 
 /**
@@ -38,13 +30,37 @@ export function Safety() {
             caption="What is built before the product itself"
             head={["Built first", "Why it comes before the chat"]}
             rows={[
-              { term: "Verified 18+ at signup", detail: "A date-of-birth field is not compliance. Real verification costs conversion, and that is the price of operating legally." },
-              { term: "Text classification before delivery", detail: "Scanned before the other person sees it, not after they report it." },
-              { term: "In-chat report button and human review", detail: "A report produces a case, a case produces an action, and the action is logged." },
-              { term: "Grievance Officer workflow", detail: "Acknowledged within 24 hours, resolved within 15. A named human with published contact details." },
-              { term: "Device and IP bans that survive re-signup", detail: "A ban that resets on a fresh account is not a ban." },
-              { term: "CSAM detection and mandated reporting", detail: "A documented, tested pipeline with law-enforcement contacts established before launch. Not a feature added later." },
-              { term: "Only then: matching and chat", detail: "Roughly two weeks of work, because everything hard was already built." },
+              {
+                term: "Verified 18+ at signup",
+                detail:
+                  "A date-of-birth field is not compliance. Real verification costs conversion, and that is the price of operating legally.",
+              },
+              {
+                term: "Text classification before delivery",
+                detail: "Scanned before the other person sees it, not after they report it.",
+              },
+              {
+                term: "In-chat report button and human review",
+                detail: "A report produces a case, a case produces an action, and the action is logged.",
+              },
+              {
+                term: "Grievance Officer workflow",
+                detail:
+                  "Acknowledged within 24 hours, resolved within 15. A named human with published contact details.",
+              },
+              {
+                term: "Device and IP bans that survive re-signup",
+                detail: "A ban that resets on a fresh account is not a ban.",
+              },
+              {
+                term: "CSAM detection and mandated reporting",
+                detail:
+                  "A documented, tested pipeline with law-enforcement contacts established before launch. Not a feature added later.",
+              },
+              {
+                term: "Only then: matching and chat",
+                detail: "Roughly two weeks of work, because everything hard was already built.",
+              },
             ].map((row) => [
               <span key="t" className="font-bold text-foreground">
                 {row.term}
@@ -67,14 +83,12 @@ export function Safety() {
             </Card>
 
             <Card accent="violet" variant="card" className="p-6">
-              <h3 className="font-display text-lg font-bold text-foreground">
-                Operating hours, at first
-              </h3>
+              <h3 className="font-display text-lg font-bold text-foreground">Operating hours, at first</h3>
               <p className="mt-2 text-sm leading-relaxed text-ink-soft">
                 During the closed beta, matching is live only while a human moderator is on shift. It is
-                unglamorous and it caps how fast this can grow. That is the point: usage must never grow faster
-                than our ability to moderate it, because moderation cost rises with scale while revenue does
-                not.
+                unglamorous and it caps how fast this can grow. That is the point: usage must never grow
+                faster than our ability to moderate it, because moderation cost rises with scale while revenue
+                does not.
               </p>
             </Card>
           </div>
@@ -89,7 +103,10 @@ export function Safety() {
               caption="Changes from the original anonymous-chat spec"
               head={["The tempting version", "What we built instead", "Why"]}
               rows={publishableChanges.map((row) => [
-                <span key="o" className="font-semibold text-muted-foreground line-through decoration-violet/50">
+                <span
+                  key="o"
+                  className="font-semibold text-muted-foreground line-through decoration-violet/50"
+                >
                   {row.original}
                 </span>,
                 <span key="r" className="font-bold text-foreground">
@@ -137,8 +154,14 @@ export function Safety() {
               head={["Model", "Verdict"]}
               rows={[
                 ["₹49 one-time entry", "Chosen. Quality filter, funds moderation, makes bans enforceable."],
-                ["₹99/month subscription", "Possible later, for interest-filtered matching and more daily chats."],
-                ["Advertising", "Ruled out. Advertisers abandon this category, and it is uninsurable on brand safety."],
+                [
+                  "₹99/month subscription",
+                  "Possible later, for interest-filtered matching and more daily chats.",
+                ],
+                [
+                  "Advertising",
+                  "Ruled out. Advertisers abandon this category, and it is uninsurable on brand safety.",
+                ],
                 ["Free at scale", "The trap. Unbounded moderation cost against zero revenue."],
               ].map(([model, verdict]) => [
                 <span key="m" className="font-bold text-foreground">

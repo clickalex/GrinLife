@@ -55,7 +55,10 @@ export function DualViewToggle({ className }: { className?: string }) {
     <div
       role="radiogroup"
       aria-label="Explanation level"
-      className={cn("inline-flex items-center gap-1 rounded-full border border-border bg-card p-1", className)}
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full border border-border bg-card p-1",
+        className,
+      )}
     >
       {options.map((option) => {
         const selected = mode === option.id;

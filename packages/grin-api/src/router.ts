@@ -101,5 +101,16 @@ export function createApiRouter(store: GateStore): Router {
     res.json(payload(store.reset()));
   });
 
+  /**
+   * Anything under /api that is not one of the routes above is a 404 *in JSON*.
+   *
+   * Without this the request falls through to the host app's single-page fallback,
+   * which answers an API call with HTML — and, when the build is absent, with
+   * Express's default error page, which prints an absolute server path.
+   */
+  router.use((req: Request, res: Response) => {
+    res.status(404).json({ error: `No API route for ${req.method} ${req.originalUrl}` });
+  });
+
   return router;
 }

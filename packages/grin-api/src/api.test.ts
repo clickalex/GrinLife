@@ -79,7 +79,9 @@ describe("GET /api", () => {
 describe("PATCH /api/gates/:gateId/criteria/:n", () => {
   it("records a numeric measurement and clears the gate at threshold", async () => {
     const values = [250, 50, 60, 1];
-    let body: any;
+    let body: { verdicts: { gateId: string; metCount: number; total: number; clear: boolean }[] } = {
+      verdicts: [],
+    };
     for (let i = 0; i < values.length; i++) {
       const res = await fetch(`${base}/api/gates/gate-1/criteria/${i + 1}`, {
         method: "PATCH",
@@ -89,9 +91,9 @@ describe("PATCH /api/gates/:gateId/criteria/:n", () => {
       expect(res.status).toBe(200);
       body = await res.json();
     }
-    const gate1 = body.verdicts.find((v: { gateId: string }) => v.gateId === "gate-1");
-    expect(gate1.metCount).toBe(4);
-    expect(gate1.clear).toBe(true);
+    const gate1 = body.verdicts.find((v) => v.gateId === "gate-1");
+    expect(gate1?.metCount).toBe(4);
+    expect(gate1?.clear).toBe(true);
   });
 
   it("rejects a partial pass — 3 of 4 is not clear", async () => {
@@ -163,11 +165,32 @@ describe("PATCH /api/gates/:gateId/criteria/:n", () => {
   });
 });
 
+describe("unmatched API routes", () => {
+  it("answers in JSON rather than falling through to the host app", async () => {
+    const response = await fetch(`${base}/api/definitely-not-a-route`);
+    expect(response.status).toBe(404);
+    expect(response.headers.get("content-type")).toContain("application/json");
+
+    const body = (await response.json()) as { error: string };
+    expect(body.error).toContain("No API route");
+  });
+
+  it("does not leak the server's filesystem in an error", async () => {
+    // Percent-encoded dot segments are resolved by the URL parser before the request
+    // is sent, so the probes that actually reach the router are plain unknown paths.
+    // The raw-socket traversal case is covered live by scripts/audit.mjs.
+    for (const probe of ["/api/../../etc/passwd", "/api/gates/gate-1/../../secret", "/api/health/extra"]) {
+      const response = await fetch(`${base}${probe}`, { redirect: "manual" });
+      const text = await response.text();
+      expect(text, probe).not.toMatch(/\/home\/|\/Users\/|[A-Z]:\\/);
+      expect(response.status, probe).toBe(404);
+    }
+  });
+});
+
 describe("reset endpoints", () => {
   it("resets one gate, then all", async () => {
-    const one = await (
-      await fetch(`${base}/api/gates/gate-1/reset`, { method: "POST" })
-    ).json();
+    const one = await (await fetch(`${base}/api/gates/gate-1/reset`, { method: "POST" })).json();
     expect(one.verdicts[0].metCount).toBe(0);
     expect(one.verdicts[1].metCount).toBeGreaterThan(0);
 
