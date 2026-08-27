@@ -28,8 +28,8 @@ function hasSourceFiles(dir: string): boolean {
 }
 
 describe("monorepo apps", () => {
-  it("finds both front-ends", () => {
-    expect(apps.sort()).toEqual(["grinlife", "legacy-landing"]);
+  it("finds every front-end", () => {
+    expect(apps.sort()).toEqual(["grinlife", "legacy-landing", "serendipity-landing", "social-landing"]);
   });
 });
 

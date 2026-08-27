@@ -102,6 +102,8 @@ Both apps consume the same two packages and contain no duplicated components. Th
 
 ---
 
+---
+
 ## Part 3 — What was built, and what was verified
 
 ### What shipped
@@ -109,52 +111,82 @@ Both apps consume the same two packages and contain no duplicated components. Th
 | Asset | Count | Notes |
 |---|---|---|
 | `packages/grin-ui` primitives | 14 | Container, Section, Typography, Button, Badge, Card, Callout, DataTable, Stat, Accordion, Tabs, SkipLink, Reveal, ErrorBoundary |
-| `packages/grin-ui` patterns | 16 | SiteHeader, SiteFooter, PageHero, SectionRail + SectionChips, Lantern, DualView, GateCard, PhaseCard, RelayChart, SpineMatrix, MetricTable, RiskTable, PricingTable, ProductCard, ProductSite, Sources |
+| `packages/grin-ui` patterns | 17 | SiteHeader, SiteFooter, PageHero, SectionRail + SectionChips, Lantern, DualView, GateCard, GateBoard, PhaseCard, RelayChart, SpineMatrix, MetricTable, RiskTable, PricingTable, ProductCard, ProductSite, Sources |
 | `packages/grin-ui` hooks | 5 | useScrollSpy, useReducedMotion, useLocalStorage, useMediaQuery, useInView |
-| `packages/grin-content` modules | 6 | portfolio, legacy, social, serendipity, types, index |
+| `packages/grin-content` modules | 8 | portfolio, legacy, social, serendipity, gateInputs, gateStatus, types, index |
+| `packages/grin-api` | 2 | `GateStore` (atomic JSON persistence) and the Express router that mounts it |
 | `apps/grinlife` routes | 9 | `/`, `/roadmap`, `/gates`, `/spine`, `/docs`, three product routes, 404 |
 | `apps/legacy-landing` | 1 page | The Phase-0 brief: one page, three sample stories, one price, one CTA |
+| `apps/social-landing` | 1 page | Feed-free matching, one city at a time, city waitlist, published obligations |
+| `apps/serendipity-landing` | 1 page | Quarantined brand, text-only, Permanent button, closed beta |
 
-Neither app contains a component of its own. Both compose `@grin/ui` from `@grin/content` data.
-46 package source files, 25 app source files.
+54 package source files carry the design system, content model and API. 41 app source files
+carry composition. **No app contains a component of its own.**
 
 ### Verification results, as run
 
 | Check | Result |
 |---|---|
-| `npm install` | 270 packages, workspaces linked (`node_modules/@grin/{ui,content,app-grinlife,app-legacy-landing}`) |
-| `tsc --noEmit -p tsconfig.json` | exit 0, no diagnostics, across both packages and both apps |
-| `vitest run` | **64 passed, 0 failed**, 5 test files |
-| `npm run build` | grinlife: 39.09 kB CSS + 337.55 kB JS (106.61 kB gzip); legacy-landing: 38.23 kB CSS + 286.07 kB JS (92.33 kB gzip); both Express servers bundled |
-| `npm start` (both apps) | 200 on `/`, `/roadmap`, `/products/serendipity`, `/docs`, and an unknown path (SPA fallback); CSS asset 200 as `text/css` |
-| Dev servers | both 200 on `0.0.0.0:3000` and `0.0.0.0:3001`; `@grin/ui` resolves over `/@fs/…/packages/grin-ui/src` |
+| `npm install` | Workspaces linked: `@grin/{ui,content,api}` and all four apps |
+| `tsc --noEmit -p tsconfig.json` | exit 0, no diagnostics, across three packages and four apps |
+| `vitest run` | **110 passed, 0 failed**, 9 test files |
+| `npm run build` | All four apps build — 39.46 / 38.57 / 39.16 / 38.59 kB CSS and 108.76 / 92.75 / 91.25 / 91.05 kB gzipped JS; grinlife's server bundle is 48.5 kB because it embeds the API |
+| Live dev servers | API on `:3010`; sites on `:3000`, `:3001`, `:3002`, `:3003` — all 200 |
+| API through the browser's origin | `GET /api/health` → `{"ok":true,"service":"grin-status","gates":2}` via the Vite proxy on `:3000` |
+| Gate round-trip | 4× `PATCH /api/gates/gate-1/criteria/n` → 200; verdict `4/4 clear=true`; file `apps/grinlife/data/gate-status.json` written; `POST /api/gates/reset` → back to `0/4 clear=false` |
+| Production servers | 200 on every route including deep links and unknown paths; CSS served as `text/css` |
 
 ### What the tests actually exercise
 
-- `content.test.ts` (21) — reads the data model and, for the document index, opens the real
-  files in `Demo/DOCS/` to confirm the paths resolve.
+- `content.test.ts` (21) — reads the data model and opens the real files in `Demo/DOCS/` to
+  confirm the document index resolves.
+- `gateStatus.test.ts` (12) — the gate arithmetic both server and browser run: threshold at
+  exactly the target, `≤1 engineer` failing at 2, an unrecorded value counting as *not met*
+  rather than as zero, and no clear on a partial pass.
+- `api.test.ts` (14) — store behaviour plus real HTTP round-trips against a listening Express
+  server, including 400s for a number sent to a boolean criterion and 404s for unknown gates.
 - `ui.test.tsx` (12) — renders the real shared components: RelayChart, GateCard, DualView,
   Tabs, SpineMatrix, SectionRail, ProductSite.
-- `App.test.tsx` (18) — renders the real `App` at every route through the real router, and
-  asserts each route renders a *distinct* page rather than the home page nine times.
-- `App.test.tsx` for the landing page (4) — including a check that no `<img>` points at a
-  remote host, which is defect P4 above.
-- `tests/sources.test.ts` (9) — for every app, resolves each `@source` glob in its CSS to a
+- `App.test.tsx` for grinlife (19) — renders the real `App` at every route through the real
+  router, asserts each route renders a *distinct* page, and asserts the gates page falls back
+  to browser-local storage when the API is unreachable.
+- One `App.test.tsx` per landing page (4 + 5 + 6) — including a check that no `<img>` points at
+  a remote host (defect P4), and the brand-quarantine assertions for Serendipity.
+- `tests/sources.test.ts` (17) — for every app, resolves each `@source` glob in its CSS to a
   real directory and asserts both shared packages are scanned.
 
-### One defect found and fixed during verification
+### Three defects found and fixed during verification
 
-The first build produced 17.22 kB of CSS containing only four accent utilities. Cause: the
-`@source` paths in `apps/*/src/styles/app.css` were off by one directory level, so Tailwind
-never scanned `packages/grin-ui/src` and silently purged every utility used inside a shared
-component — while the build still succeeded. After correcting the paths the CSS is 39.09 kB
-and contains the full accent set (`bg-coral`, `bg-moss`, `bg-violet`, `bg-honey` and their
-soft/ink variants). `tests/sources.test.ts` exists so this cannot recur unnoticed.
+1. **Purged design system.** The first build produced 17.22 kB of CSS containing four accent
+   utilities. The `@source` paths in `apps/*/src/styles/app.css` were off by one directory
+   level, so Tailwind never scanned `packages/grin-ui/src` and silently dropped every utility
+   used inside a shared component — while the build still succeeded. Corrected, the CSS is
+   39.46 kB with the full accent set (`bg-coral`, `bg-moss`, `bg-violet`, `bg-honey` and their
+   soft/ink variants). `tests/sources.test.ts` exists so this cannot recur
+   unnoticed.
+2. **A route test that passed for the wrong reason.** The first version rendered each route
+   with wouter's `ssrPath`, which jsdom ignores — so all nine routes silently rendered the
+   home page and every assertion passed. Rewritten to drive the History API, plus an explicit
+   assertion that the nine routes produce nine distinct headings.
+3. **A shipped-but-missing script.** `npm run dev:all` pointed at `scripts/dev-all.mjs`, which
+   did not exist. Replaced by `scripts/dev.mjs`, which now launches the status API and the
+   front-ends behind one origin.
+
+### Closed from the original open list
+
+| Was open | Now |
+|---|---|
+| "Gate checklists persist to `localStorage` only" | `@grin/api` persists measurements server-side; the browser fallback remains and is labelled on screen |
+| "The GrinSocial and Serendipity landing apps are not built" | Both built, both from the shared spine, both with route tests |
+| "The `Demo/*.zip` archives are unreferenced" | `Demo/README.MD` documents all four with the duplication measurements; their eleven design notes are extracted to `Demo/design-notes/` so the rationale is readable and diffable |
+
+The archives themselves are deliberately **not** deleted — they remain the only record of the
+four original implementations. Removing them is a one-line change if that is wanted.
 
 ### Still open
 
-- The `Demo/*.zip` archives are unreferenced by the monorepo. Retiring them is a separate
-  decision — they are the only record of the four original designs.
-- Gate checklists persist to `localStorage` only; wiring them to real metrics needs an API.
-- The GrinSocial and Serendipity landing apps are not built. When their gates pass they should
-  be roughly a data file and a route each, because the components already exist.
+- Gate targets are the plan's numbers; wiring them to real Stripe, print-fulfilment and
+  retention feeds is the next step, and needs those systems to exist.
+- The landing pages use `mailto:` for their CTAs. Phase 0 is concierge by design, but a real
+  checkout belongs there once the fake-door test has run.
+- No CI. `npm run verify` is the whole gate and it is run by hand.

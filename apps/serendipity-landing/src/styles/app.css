@@ -1,0 +1,13 @@
+/**
+ * Front-end styles. Tailwind is imported here so this app controls which source
+ * trees are scanned; the two shared packages live outside this directory and must
+ * be registered explicitly. Paths are relative to this file, so the monorepo root
+ * is four levels up.
+ */
+
+@import "tailwindcss";
+@import "@grin/ui/styles/tokens.css";
+
+@source "..";
+@source "../../../../packages/grin-ui/src";
+@source "../../../../packages/grin-content/src";

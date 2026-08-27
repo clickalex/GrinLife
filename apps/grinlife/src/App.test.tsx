@@ -10,7 +10,7 @@
  * the home page under jsdom — an easy way to make these tests pass vacuously.
  */
 import { afterEach, describe, expect, it } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import App from "./App";
 import { getPhases, products, routes } from "@grin/content";
 
@@ -101,12 +101,30 @@ describe("roadmap page", () => {
 });
 
 describe("gates page", () => {
-  it("renders both checklists — four criteria plus five", () => {
+  it("renders both boards as live measurement inputs", () => {
     renderAt("/gates");
 
-    expect(screen.getAllByRole("button", { pressed: false })).toHaveLength(9);
-    expect(screen.getByText(/Reset both checklists/)).toBeTruthy();
-    expect(screen.getAllByText(/If not met/)).toHaveLength(2);
+    // Gate 1 is four numeric criteria, Gate 2 is one numeric plus four booleans.
+    expect(screen.getAllByRole("spinbutton")).toHaveLength(5);
+    expect(screen.getAllByRole("button", { pressed: false })).toHaveLength(4);
+    // One progress bar per gate, starting empty.
+    const bars = screen.getAllByRole("progressbar");
+    expect(bars).toHaveLength(2);
+    for (const bar of bars) expect(bar.getAttribute("aria-valuenow")).toBe("0");
+    // Per-gate reset plus the global one.
+    expect(screen.getAllByRole("button", { name: /Reset/ })).toHaveLength(3);
+    expect(screen.getAllByText(/the gate is not passed/)).toHaveLength(2);
+  });
+
+  it("falls back to browser-local storage when the API is unreachable", async () => {
+    renderAt("/gates");
+
+    // jsdom has no server behind /api/gates, so the fetch fails and the page must
+    // say so rather than imply the decision was recorded.
+    await waitFor(() =>
+      expect(screen.getByText(/No status API — browser-local/)).toBeTruthy(),
+    );
+    expect(screen.getAllByText(/Saved in browser/)).toHaveLength(2);
   });
 });
 

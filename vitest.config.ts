@@ -5,6 +5,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@grin/ui": path.resolve(import.meta.dirname, "packages/grin-ui/src/index.ts"),
+      "@grin/api": path.resolve(import.meta.dirname, "packages/grin-api/src/index.ts"),
       "@grin/content": path.resolve(import.meta.dirname, "packages/grin-content/src/index.ts"),
     },
   },

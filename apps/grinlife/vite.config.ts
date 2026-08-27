@@ -28,6 +28,14 @@ export default defineConfig({
     fs: {
       allow: [monorepoRoot],
     },
+    // The browser only ever talks to this origin; /api is proxied to the status
+    // API process so nothing in the client needs to know a second port exists.
+    proxy: {
+      "/api": {
+        target: "http://127.0.0.1:3010",
+        changeOrigin: true,
+      },
+    },
   },
   preview: {
     host: "0.0.0.0",

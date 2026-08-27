@@ -4,15 +4,15 @@
   "private": true,
   "type": "module",
   "license": "MIT",
-  "description": "GrinLife — one shared spine, two front-ends, three product roadmaps.",
+  "description": "GrinLife \u2014 one shared spine, two front-ends, three product roadmaps.",
   "workspaces": [
     "packages/*",
     "apps/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace @grin/app-grinlife",
-    "dev:landing": "npm run dev --workspace @grin/app-legacy-landing",
-    "dev:all": "node scripts/dev-all.mjs",
+    "dev": "node scripts/dev.mjs grinlife",
+    "dev:landing": "node scripts/dev.mjs landing",
+    "dev:all": "node scripts/dev.mjs all",
     "build": "npm run build --workspaces --if-present",
     "start": "npm run start --workspace @grin/app-grinlife",
     "typecheck": "tsc --noEmit -p tsconfig.json",
@@ -31,7 +31,8 @@
     "prettier": "^3.6.2",
     "typescript": "^5.6.3",
     "vite": "^7.1.7",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "tsx": "^4.19.1"
   },
   "engines": {
     "node": ">=20.19.0"

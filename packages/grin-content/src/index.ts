@@ -31,6 +31,15 @@ import type { AccentId, Phase, Product, ProductId } from "./types";
 
 export * from "./types";
 
+export { gateInputs, gateIds, inputsForGate } from "./gateInputs";
+export {
+  evaluateCriterion,
+  criterionProgress,
+  evaluateGate,
+  evaluateAll,
+  antiDriftState,
+} from "./gateStatus";
+
 export {
   antiDriftRule,
   brandArchitecture,

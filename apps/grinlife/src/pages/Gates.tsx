@@ -1,88 +1,201 @@
 /**
- * The two kill gates, as working checklists. Criteria you confirm are remembered
- * locally, so a founder can come back to this page during a real gate review.
+ * The two kill gates as live measurement boards.
+ *
+ * Measurements persist to the status API (`packages/grin-api`). When that API is
+ * not reachable — a static build, a demo, an offline machine — the page falls back
+ * to browser-local storage and says so on screen, so nobody mistakes a local
+ * checklist for a recorded decision.
  */
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  Button,
   Callout,
   Card,
   Eyebrow,
-  GateCard,
+  GateBoard,
   Heading,
   Lede,
   PageHero,
   Section,
+  StatGrid,
   useLocalStorage,
 } from "@grin/ui";
-import { antiDriftRule, gates, getProduct } from "@grin/content";
-
-type GateState = Record<string, string[]>;
+import {
+  antiDriftRule,
+  evaluateAll,
+  gates,
+  getProduct,
+  type CriterionState,
+  type GateStatusRecord,
+} from "@grin/content";
+import { applyPatch, fetchGates, resetAllGates, resetGate, type GatePatch, type GatesPayload } from "../lib/gateApi";
 
 export default function Gates() {
-  const [state, setState] = useLocalStorage<GateState>("grinlife:gate-review", {});
+  const [local, setLocal] = useLocalStorage<GateStatusRecord>("grinlife:gate-status", {});
+  const [payload, setPayload] = useState<GatesPayload | null>(null);
+  const [online, setOnline] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const noteTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
-  const toggle = (gateId: string, n: string) =>
-    setState((current) => {
-      const list = current[gateId] ?? [];
-      return {
-        ...current,
-        [gateId]: list.includes(n) ? list.filter((item) => item !== n) : [...list, n],
-      };
+  useEffect(() => {
+    let cancelled = false;
+    fetchGates().then((data) => {
+      if (cancelled || !data) return;
+      setPayload(data);
+      setOnline(true);
     });
+    return () => {
+      cancelled = true;
+      for (const timer of Object.values(noteTimers.current)) clearTimeout(timer);
+    };
+  }, []);
 
-  const reset = () => setState({});
+  const status = online && payload ? payload.status : local;
+  const verdicts = online && payload ? payload.verdicts : evaluateAll(status);
 
-  const gate1 = gates[0];
-  const gate2 = gates[1];
-  if (!gate1 || !gate2) throw new Error("GrinLife gates are missing from @grin/content");
+  const patchLocal = useCallback(
+    (gateId: string, patch: GatePatch) => {
+      setLocal((current) => {
+        const gate = current[gateId] ?? {};
+        const previous: CriterionState = gate[patch.n] ?? {};
+        const next: CriterionState = { ...previous, updatedAt: new Date().toISOString() };
+        if (patch.kind === "value") {
+          if (patch.value === null) delete next.value;
+          else next.value = patch.value;
+        }
+        if (patch.kind === "confirmed") next.confirmed = patch.confirmed;
+        if (patch.kind === "note") next.note = patch.note;
+        return { ...current, [gateId]: { ...gate, [patch.n]: next } };
+      });
+    },
+    [setLocal],
+  );
 
-  const gate1Product = getProduct(gate1.unlocks);
-  const gate2Product = getProduct(gate2.unlocks);
+  const commit = useCallback(
+    async (gateId: string, patch: GatePatch) => {
+      if (!online) {
+        patchLocal(gateId, patch);
+        return;
+      }
+
+      // Notes arrive on every keystroke; give the writer a moment to settle.
+      if (patch.kind === "note") {
+        const key = `${gateId}/${patch.n}`;
+        clearTimeout(noteTimers.current[key]);
+        noteTimers.current[key] = setTimeout(() => {
+          void applyPatch(gateId, patch).then((next) => {
+            if (next) setPayload(next);
+            else setOnline(false);
+          });
+        }, 500);
+        return;
+      }
+
+      setBusy(true);
+      const next = await applyPatch(gateId, patch);
+      setBusy(false);
+      if (next) setPayload(next);
+      else setOnline(false);
+    },
+    [online, patchLocal],
+  );
+
+  const handleReset = useCallback(
+    async (gateId: string) => {
+      if (!online) {
+        setLocal((current) => {
+          const next = { ...current };
+          delete next[gateId];
+          return next;
+        });
+        return;
+      }
+      const next = await resetGate(gateId);
+      if (next) setPayload(next);
+      else setOnline(false);
+    },
+    [online, setLocal],
+  );
+
+  const handleResetAll = useCallback(async () => {
+    if (!online) {
+      setLocal({});
+      return;
+    }
+    const next = await resetAllGates();
+    if (next) setPayload(next);
+    else setOnline(false);
+  }, [online, setLocal]);
 
   return (
     <>
       <PageHero
-        eyebrow="§6 — Gates"
+        eyebrow="§6 — Gates · live measurement"
         title="The gates are the strategy"
-        lede="Without these, 'three products in sequence' quietly becomes 'three products in parallel' by month nine. Decide the numbers now, while you are calm and nothing is at stake."
-        actions={
-          <Button variant="outline" onClick={reset}>
-            Reset both checklists
-          </Button>
-        }
+        lede="Without these, 'three products in sequence' quietly becomes 'three products in parallel' by month nine. Enter the real numbers; the verdict only clears when every criterion is met."
         aside={
-          <Card variant="paper" accent="violet" className="p-5">
-            <p className="grin-label text-violet-ink">Anti-drift rule</p>
-            <p className="mt-2 font-display text-lg font-bold text-foreground">{antiDriftRule.rule}</p>
-            <p className="mt-2 text-sm leading-relaxed text-ink-soft">{antiDriftRule.gloss}</p>
-          </Card>
+          <div className="space-y-4">
+            <StatGrid
+              accent="coral"
+              className="grid-cols-2 lg:grid-cols-2"
+              items={verdicts.map((verdict) => ({
+                value: `${verdict.metCount}/${verdict.total}`,
+                label: verdict.gateId === "gate-1" ? "Gate 1 · month 12" : "Gate 2 · month 24",
+                note: verdict.clear ? "Clear — next wave may build" : "Not passed",
+              }))}
+            />
+            <Card variant="paper" accent={online ? "moss" : "honey"} className="p-5">
+              <p className="grin-label text-muted-foreground">
+                {online ? "Connected to the status API" : "No status API — browser-local"}
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+                {online
+                  ? "Measurements are stored on the server, so a gate decision is recorded once for the company instead of living in one person's browser."
+                  : "Nothing is reachable at /api/gates, so measurements are saved in this browser only. Run the status API to record them properly."}
+              </p>
+            </Card>
+          </div>
         }
       />
 
       <Section spacing="normal">
         <div className="space-y-14">
-          <div className="space-y-3">
-            <Eyebrow>Permission to build</Eyebrow>
-            <Heading size="title">Two decisions, all criteria required</Heading>
-            <Lede>
-              Each gate is a pass/fail on every criterion at once. A gate that is "mostly met" is a gate that
-              failed — the fudging happens one criterion at a time.
-            </Lede>
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="space-y-3">
+              <Eyebrow>Permission to build</Eyebrow>
+              <Heading size="title">Two decisions, all criteria required</Heading>
+              <Lede>
+                Each gate is a pass/fail on every criterion at once. A gate that is "mostly met" is a gate that
+                failed — the fudging happens one criterion at a time.
+              </Lede>
+            </div>
+            <button
+              type="button"
+              onClick={() => void handleResetAll()}
+              className="rounded-full border border-border px-4 py-2 text-xs font-bold text-ink-soft hover:bg-muted"
+            >
+              Reset both gates
+            </button>
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <GateCard
-              gate={gate1}
-              unlockedProduct={gate1Product?.name ?? "GrinSocial"}
-              checked={state[gate1.id] ?? []}
-              onToggle={(n) => toggle(gate1.id, n)}
-            />
-            <GateCard
-              gate={gate2}
-              unlockedProduct={gate2Product?.name ?? "Serendipity"}
-              checked={state[gate2.id] ?? []}
-              onToggle={(n) => toggle(gate2.id, n)}
-            />
+            {gates.map((gate) => {
+              const verdict = verdicts.find((candidate) => candidate.gateId === gate.id);
+              if (!verdict) return null;
+              return (
+                <GateBoard
+                  key={gate.id}
+                  gate={gate}
+                  verdict={verdict}
+                  unlockedProduct={getProduct(gate.unlocks)?.name ?? gate.unlocks}
+                  online={online}
+                  busy={busy}
+                  onValue={(n, value) => void commit(gate.id, { kind: "value", n, value })}
+                  onConfirm={(n, confirmed) => void commit(gate.id, { kind: "confirmed", n, confirmed })}
+                  onNote={(n, note) => void commit(gate.id, { kind: "note", n, note })}
+                  onReset={() => void handleReset(gate.id)}
+                />
+              );
+            })}
           </div>
 
           <div className="grid gap-5 lg:grid-cols-2">
@@ -93,11 +206,8 @@ export default function Gates() {
                 start.
               </p>
             </Callout>
-            <Callout tone="kill" label="If Gate 2 is anything short of a clear pass">
-              <p>
-                Skip Wave 3 permanently. Nothing downstream depends on it. A profitable two-product company
-                beats a three-product company in litigation.
-              </p>
+            <Callout tone="kill" title={antiDriftRule.rule}>
+              <p>{antiDriftRule.gloss}</p>
             </Callout>
           </div>
         </div>

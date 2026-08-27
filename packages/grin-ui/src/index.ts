@@ -52,6 +52,7 @@ export {
   type ViewMode,
 } from "./patterns/DualView";
 export { GateCard } from "./patterns/GateCard";
+export { GateBoard } from "./patterns/GateBoard";
 export { PhaseCard } from "./patterns/PhaseCard";
 export { RelayChart } from "./patterns/RelayChart";
 export { SpineMatrix } from "./patterns/SpineMatrix";

@@ -130,3 +130,52 @@ export interface DocumentEntry {
   wave: string;
   summary: string;
 }
+
+/* ---------------------------------------------------------------------------
+ * Gate measurement.
+ *
+ * The plan states each criterion in prose. These types express the same criteria
+ * as something a dashboard and an API can compare real numbers against.
+ * ------------------------------------------------------------------------- */
+
+export type CriterionKind = "numeric" | "boolean";
+
+export interface GateInput {
+  /** Matches `GateCriterion.n`, so the prose and the measurement stay paired. */
+  n: string;
+  label: string;
+  kind: CriterionKind;
+  /** Omitted for boolean criteria. */
+  target?: number;
+  unit?: string;
+  /** `at-least` for "250+ customers", `at-most` for "≤1 engineer". */
+  direction?: "at-least" | "at-most";
+}
+
+/** The measured state of one criterion, as recorded by the API. */
+export interface CriterionState {
+  value?: number;
+  confirmed?: boolean;
+  note?: string;
+  updatedAt?: string;
+}
+
+/** `{ [gateId]: { [criterion n]: state } }` */
+export type GateStatusRecord = Record<string, Record<string, CriterionState>>;
+
+export interface GateCriterionVerdict {
+  input: GateInput;
+  state?: CriterionState;
+  met: boolean;
+  /** 0–1 progress toward the target; boolean criteria are 0 or 1. */
+  progress: number;
+}
+
+export interface GateVerdict {
+  gateId: string;
+  criteria: GateCriterionVerdict[];
+  metCount: number;
+  total: number;
+  /** True only when every criterion is met — the plan allows no partial pass. */
+  clear: boolean;
+}
