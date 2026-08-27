@@ -42,11 +42,14 @@ export default function Gates() {
   const [online, setOnline] = useState(false);
   const [busy, setBusy] = useState(false);
   const noteTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  /** Latest server state, so an offline flip can carry it into local storage. */
+  const latest = useRef<GateStatusRecord>({});
 
   useEffect(() => {
     let cancelled = false;
     fetchGates().then((data) => {
       if (cancelled || !data) return;
+      latest.current = data.status;
       setPayload(data);
       setOnline(true);
     });
@@ -55,6 +58,23 @@ export default function Gates() {
       for (const timer of Object.values(noteTimers.current)) clearTimeout(timer);
     };
   }, []);
+
+  /**
+   * The API can go away between page load and a keystroke. Flipping to browser-local
+   * storage without carrying the server values over would blank every measurement the
+   * reader just entered, so the last known state is merged in on the way down.
+   */
+  const goOffline = useCallback(() => {
+    setOnline(false);
+    setLocal((current) => {
+      const server = latest.current;
+      const merged: GateStatusRecord = { ...current };
+      for (const [gateId, criteria] of Object.entries(server)) {
+        merged[gateId] = { ...criteria, ...(merged[gateId] ?? {}) };
+      }
+      return merged;
+    });
+  }, [setLocal]);
 
   const status = online && payload ? payload.status : local;
   const verdicts = online && payload ? payload.verdicts : evaluateAll(status);
@@ -90,8 +110,12 @@ export default function Gates() {
         clearTimeout(noteTimers.current[key]);
         noteTimers.current[key] = setTimeout(() => {
           void applyPatch(gateId, patch).then((next) => {
-            if (next) setPayload(next);
-            else setOnline(false);
+            if (next) {
+              latest.current = next.status;
+              setPayload(next);
+            } else {
+              goOffline();
+            }
           });
         }, 500);
         return;
@@ -100,10 +124,14 @@ export default function Gates() {
       setBusy(true);
       const next = await applyPatch(gateId, patch);
       setBusy(false);
-      if (next) setPayload(next);
-      else setOnline(false);
+      if (next) {
+        latest.current = next.status;
+        setPayload(next);
+      } else {
+        goOffline();
+      }
     },
-    [online, patchLocal],
+    [online, patchLocal, goOffline],
   );
 
   const handleReset = useCallback(
@@ -117,10 +145,14 @@ export default function Gates() {
         return;
       }
       const next = await resetGate(gateId);
-      if (next) setPayload(next);
-      else setOnline(false);
+      if (next) {
+        latest.current = next.status;
+        setPayload(next);
+      } else {
+        goOffline();
+      }
     },
-    [online, setLocal],
+    [online, setLocal, goOffline],
   );
 
   const handleResetAll = useCallback(async () => {
@@ -129,9 +161,13 @@ export default function Gates() {
       return;
     }
     const next = await resetAllGates();
-    if (next) setPayload(next);
-    else setOnline(false);
-  }, [online, setLocal]);
+    if (next) {
+      latest.current = next.status;
+      setPayload(next);
+    } else {
+      goOffline();
+    }
+  }, [online, setLocal, goOffline]);
 
   return (
     <>

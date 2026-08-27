@@ -28,7 +28,8 @@ export function useScrollSpy(ids: string[], offset = 140): string {
       window.removeEventListener("scroll", measure);
       window.removeEventListener("resize", measure);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // `ids` is deliberately absent: the joined signature is the real dependency, and
+    // listing the array itself would re-subscribe on every render.
   }, [signature, offset]);
 
   return active;

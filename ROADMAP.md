@@ -240,10 +240,10 @@ four original implementations. Removing them is a one-line change if that is wan
 
 ## Part 4 — The hundred-check audit
 
-`scripts/audit.mjs` runs 105 numbered checks over the repository, the build, the
+`scripts/audit.mjs` runs the numbered checks listed in `AUDIT.md` over the repository, the build, the
 live production server and the content model, printing the value each one observed.
 `npm run verify` now ends with it, so a regression in any of the 105 fails the gate.
-`AUDIT.md` is the last run: **105/105**.
+`AUDIT.md` is the last run and carries the authoritative check count.
 
 ### Six behavioural defects it found, and the fixes
 
@@ -283,22 +283,24 @@ resolves encoded dot segments before the request leaves the test.
 
 | Check                    | Result                                                                                       |
 | ------------------------ | -------------------------------------------------------------------------------------------- |
-| `npm run verify`         | exit 0 — typecheck, tests, build and the 105-check audit in one pass                         |
+| `npm run verify`         | exit 0 — typecheck, tests, build and the full audit in one pass                              |
 | `vitest run`             | **194 passed, 0 failed**, 8 test files                                                       |
-| `node scripts/audit.mjs` | **105/105 checks pass**                                                                      |
+| `node scripts/audit.mjs` | **every check passes**                                                                       |
 | `npm run audit:streak`   | **10 consecutive clean passes + confirmation**, 11 clean audits in a row (`AUDIT-STREAK.md`) |
 | `npm run build`          | 40.75 kB CSS (7.88 kB gzip), 383.26 kB JS (**119.94 kB gzip**), server bundle 50.8 kB        |
 | Live production server   | `:4321` — 8 routes 200, unknown path 404, deep links resolve, gate round-trip 4/4 then reset |
 
 ## Part 5 — Repeated audit, and what repetition is worth
 
-`npm run audit:streak` runs the whole audit — typecheck, the test suite, a production build
-and a live server — until it records **10 consecutive clean passes**. Any failing attempt
-resets the streak to zero rather than being skipped.
+`npm run audit:streak [target] [maxAttempts]` runs the whole audit — typecheck, the test
+suite, a production build and a live server — until it records the target number of
+consecutive clean passes. Any failing attempt resets the streak to zero rather than being
+skipped. It has been run to 10 and then to 20.
 
-**Result: 10 consecutive clean passes, plus a confirmation run — 11 clean audits in a row,
-105/105 checks each, 33–37 s per attempt.** Eleven runs therefore also means eleven
-consecutive passes of the 194-test suite and eleven clean builds. `AUDIT-STREAK.md` is the log.
+**Latest result: 20 consecutive clean passes, plus a confirmation run — 21 clean audits in a
+row, 116/116 checks each, 37–41 s per attempt (811 s total).** That is also 21 consecutive
+passes of the 201-test suite and 21 clean production builds. `AUDIT-STREAK.md` is the log.
+The first streak, at 105 checks and 194 tests, reached 10 consecutive passes.
 
 The harness now runs one extra audit _after_ writing its own report, because the first version
 did not and that turned out to matter.
@@ -312,8 +314,31 @@ What repetition actually bought, and what it did not:
 | Dead code in the public API                | `useReducedMotion` was exported and consumed by nothing. `Reveal` now uses it, so a visitor who asks for no motion never receives the animation node at all rather than a 0.001 ms one.                                                                                                                                                                                                                         |
 | Nothing else                               | The remaining runs were equivalent in outcome. That is the useful result: the checks are deterministic, so a future failure means a regression and not a race.                                                                                                                                                                                                                                                  |
 
-**What the streak does not prove.** It shows the 105 checks are stable and that nothing
-regressed across eleven full build-test-serve cycles. It says nothing about defects the checks
+### The 20-pass run was a fixed point, not a repeat
+
+The rule for that run was stricter than "audit until it is green": audit, and **fix or add
+anything the pass turns up; every fix or addition resets the counter to zero**. The loop only
+ends when a pass finds nothing left to change. It took one batch of work before the counter
+could start — five defects and eight additions:
+
+| Change                                          | Kind    | Why it was wrong or missing                                                                                                                                                                                                                          |
+| ----------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Gate measurements vanished when the API dropped | bug     | Four `setOnline(false)` sites flipped the page to browser-local storage that had never been populated, so everything the reader had typed disappeared. Fixed with a `latest` ref merged into local storage in `goOffline()`.                         |
+| Deep links shipped with no security headers     | bug     | `express.static` set `nosniff` and `Referrer-Policy` on the files it served, but the single-page fallback writes the shell itself and set nothing — so every route except `/` was served bare. The audit only probed `/`, which is why it missed it. |
+| Open Graph tags were invisible to crawlers      | bug     | The tags were added in the browser. Crawlers and link unfurlers do not run JavaScript, so the feature did nothing for the readers it exists for. Now injected into the shell server-side, per route, with `twitter:card` and a canonical link.       |
+| Reduced-motion users saw one frame of animation | bug     | `useReducedMotion` initialised to `false` and only read `matchMedia` after mount. Now a lazy initialiser.                                                                                                                                            |
+| A dead `eslint-disable` comment                 | bug     | The repository runs no linter, so the suppression was text pretending to be a directive.                                                                                                                                                             |
+| Measurement timestamps on the gates page        | feature | `updatedAt` was stored by the API and rendered nowhere, so a decision could not be audited later.                                                                                                                                                    |
+| `sitemap.xml` and `robots.txt`                  | feature | Generated from the same `routes` table the client router uses, so the two cannot disagree.                                                                                                                                                           |
+| Server-side per-route head                      | feature | Title, description, OG and canonical for all eight routes, plus `noindex` on the 404 shell.                                                                                                                                                          |
+| A print stylesheet, and a way to reach it       | feature | `@media print` in `tokens.css` plus a shared `PrintButton` primitive offered on the Legacy brief, whose sales motion is literally paper.                                                                                                             |
+| The criterion seam test                         | feature | `Seam.test.tsx` walks all 9 criteria through define → render → measure → verdict across three packages.                                                                                                                                              |
+
+Five of those are guarded by new audit checks (106–107, 112–116), and two by new tests. Each
+was proven to fail without its fix by stashing the fix and re-running.
+
+**What the streak does not prove.** It shows the checks as they stand are stable and that nothing
+regressed across twenty-one full build-test-serve cycles. It says nothing about defects the checks
 do not look for. Ten passes of a blind spot is still a blind spot — and the harness defect
 above is the concrete example: every one of those runs was clean while the repository was, in
 fact, in a state that failed.

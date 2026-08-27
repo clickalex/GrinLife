@@ -4,13 +4,14 @@
  * These render the real shared components — the same ones both front-ends ship —
  * so a regression in the design system fails here rather than silently on a page.
  */
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import {
   DualView,
   DualViewProvider,
   DualViewToggle,
   GateCard,
+  PrintButton,
   ProductSite,
   RelayChart,
   SectionRail,
@@ -201,5 +202,34 @@ describe("ProductSite", () => {
     render(<ProductSite product={product} phases={getPhases(product.id)} Link={TestLink} />);
     expect(document.getElementById(`${product.id}-pricing`)).toBeNull();
     expect(document.getElementById(`${product.id}-risks`)).toBeTruthy();
+  });
+});
+
+describe("PrintButton", () => {
+  const originalPrint = window.print;
+  let calls = 0;
+
+  afterEach(() => {
+    window.print = originalPrint;
+    calls = 0;
+  });
+
+  it("opens the print dialog when the browser offers one", () => {
+    window.print = () => {
+      calls += 1;
+    };
+    render(<PrintButton />);
+    fireEvent.click(screen.getByRole("button", { name: "Print this page" }));
+    expect(calls).toBe(1);
+  });
+
+  it("is a real button, so it cannot submit a form it sits inside", () => {
+    window.print = () => {
+      calls += 1;
+    };
+    render(<PrintButton label="Print the brief" accent="honey" />);
+    const button = screen.getByRole("button", { name: "Print the brief" });
+    expect(button.tagName).toBe("BUTTON");
+    expect(button.getAttribute("type")).toBe("button");
   });
 });

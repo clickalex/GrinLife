@@ -15,6 +15,16 @@ import { Callout } from "../primitives/Callout";
  * The component owns no persistence. It reports edits upward, so the page decides
  * whether they go to the API or to local storage.
  */
+/**
+ * "14 Mar 2026" — a gate decision that carries no date cannot be audited later, and
+ * `updatedAt` was being stored by the API without ever reaching the screen.
+ */
+function formatRecorded(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "an unknown date";
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(date);
+}
+
 export function GateBoard({
   gate,
   verdict,
@@ -176,6 +186,12 @@ export function GateBoard({
                 className="min-w-0 flex-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs"
               />
             </div>
+
+            {state?.updatedAt ? (
+              <p className="mt-1.5 font-mono text-[0.62rem] text-muted-foreground">
+                recorded {formatRecorded(state.updatedAt)}
+              </p>
+            ) : null}
           </li>
         ))}
       </ul>

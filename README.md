@@ -27,8 +27,8 @@ Checks:
 ```bash
 npm run typecheck  # tsc --noEmit across every package and the app
 npm test           # 194 tests: content, gate logic, API, components, routes, site audit
-npm run audit      # 105 checks over the repo, the build, the live server and the content model
-npm run audit:md   # the same 105 checks, written to AUDIT.md
+npm run audit      # 116 checks over the repo, the build, the live server and the content model
+npm run audit:md   # the same 116 checks, written to AUDIT.md
 npm run audit:streak  # run until 10 consecutive clean passes; a failure resets the streak
 npm run verify     # typecheck + test + build + audit
 ```
@@ -111,7 +111,7 @@ restored for real, `ProductSite`'s `landing` prop makes the split reversible —
 
 ## The audit
 
-`npm run audit` runs 105 numbered checks and prints what each one observed:
+`npm run audit` runs 116 numbered checks and prints what each one observed:
 
 | Group                 | What it covers                                                                                                                     |
 | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |

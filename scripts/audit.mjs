@@ -1084,6 +1084,164 @@ check("every browser-storage key is namespaced to this app", () => {
   return bad.length ? fail(`unnamespaced: ${bad.join(", ")}`) : ok(true, [...keys].join(", "));
 });
 
+// --- J. Shipped surface
+section("J. Shipped surface");
+
+check("the sitemap lists exactly the routes the app serves", async () => {
+  const response = await probe(PORT, "/sitemap.xml");
+  if (response.status !== 200 || !response.type.includes("xml")) {
+    return fail(`${response.status} ${response.type}`);
+  }
+  const listed = [...response.text.matchAll(/<loc>[^<]*?(\/[a-z0-9/-]*)<\/loc>/g)].map((m) => m[1] || "/");
+  const expected = [
+    "/",
+    "/roadmap",
+    "/gates",
+    "/spine",
+    "/docs",
+    "/products/legacy",
+    "/products/social",
+    "/products/serendipity",
+  ];
+  const missing = expected.filter((route) => !listed.includes(route));
+  const extra = listed.filter((route) => !expected.includes(route));
+  if (missing.length || extra.length)
+    return fail(`missing ${missing.join(",")} / unexpected ${extra.join(",")}`);
+  return ok(true, `${listed.length} URLs, matching the client router`);
+});
+
+check("robots.txt points crawlers at the sitemap", async () => {
+  const response = await probe(PORT, "/robots.txt");
+  if (response.status !== 200) return fail(`status ${response.status}`);
+  return response.text.includes("Sitemap:") && response.text.includes("/sitemap.xml")
+    ? ok(true, response.text.trim().split("\n").filter(Boolean).join(" · "))
+    : fail("no Sitemap directive");
+});
+
+check("the built CSS carries a print stylesheet", () => {
+  const dir = path.resolve(root, "apps/grinlife/dist/public/assets");
+  const css = fs.readdirSync(dir).find((f) => f.endsWith(".css"));
+  const text = read(`apps/grinlife/dist/public/assets/${css}`);
+  const hasPrint = text.includes("@media print");
+  const hidesChrome = hasPrint && /header[^{]*\{[^}]*display:\s*none/.test(text.replace(/\s+/g, " "));
+  return hasPrint
+    ? ok(true, hidesChrome ? "@media print present, chrome hidden" : "@media print present")
+    : fail("no @media print block survived the build");
+});
+
+check("every route gets Open Graph tags at runtime", () => {
+  const hook = read("packages/grin-ui/src/hooks/useDocumentHead.ts");
+  const app = read("apps/grinlife/src/App.tsx");
+  const needed = ["og:title", "og:description", "og:url", 'rel="canonical"'];
+  const missing = needed.filter((token) => !hook.includes(token));
+  if (missing.length) return fail(`hook does not set ${missing.join(", ")}`);
+  return app.includes("path });")
+    ? ok(true, "title, description, url and canonical per route")
+    : fail("App does not pass the route path");
+});
+
+check("gate measurements show the date they were recorded", () => {
+  const board = read("packages/grin-ui/src/patterns/GateBoard.tsx");
+  const test = read("apps/grinlife/src/Gates.test.tsx");
+  return board.includes("formatRecorded") && test.includes("updatedAt")
+    ? ok(true, "updatedAt reaches the screen and is asserted")
+    : fail("a stored date that is never rendered cannot be audited later");
+});
+
+check("every arbitrary Tailwind utility in source survives into the CSS", () => {
+  const dir = path.resolve(root, "apps/grinlife/dist/public/assets");
+  const cssFile = fs.readdirSync(dir).find((f) => f.endsWith(".css"));
+  const css = read(`apps/grinlife/dist/public/assets/${cssFile}`).replace(/\s+/g, " ");
+
+  const utility =
+    /\b(?:grid-cols|col-span|row-span|min-h|max-w|max-h|w|h|gap|gap-x|gap-y|basis|top|left|right|bottom|inset|text|leading|tracking|delay|duration|rounded|z|blur)-\[([^\]\s"']+)\]/g;
+  const used = new Set();
+  for (const file of sourceFiles().filter((f) => f.endsWith(".tsx"))) {
+    for (const [, value] of read(file).matchAll(utility)) used.add(value);
+  }
+  // Three transformations stand between a class in source and its declaration in the
+  // bundle: Tailwind turns `_` back into a space, `calc(100vh-8rem)` gains spaces around
+  // its operator, and the minifier drops leading zeros so `0.95rem` ships as `.95rem`.
+  // Compare with whitespace removed and accept either zero-padding.
+  const compact = css.replace(/\s+/g, "");
+  const forms = (value) => {
+    const flat = value.replace(/[_\s]+/g, "");
+    return [flat, flat.replace(/(^|[(,])0+(?=\.)/g, "$1")];
+  };
+  const purged = [...used].filter((value) => !forms(value).some((form) => compact.includes(form)));
+  return purged.length
+    ? fail(
+        `${purged.length} of ${used.size} arbitrary utilities missing from the CSS: ${purged.slice(0, 4).join(", ")}`,
+      )
+    : ok(true, `${used.size} arbitrary utilities all present — no silently purged layout`);
+});
+
+check("deep-linked routes carry the same security headers as the home page", async () => {
+  // `express.static` sets these for the files it serves; the single-page fallback writes
+  // the shell itself, so it has to set them too or every route except `/` ships bare.
+  const wanted = ["x-content-type-options", "referrer-policy", "cache-control"];
+  const targets = ["/", "/gates", "/spine", "/products/legacy"];
+  const weak = [];
+  for (const target of targets) {
+    const response = await fetch(`http://127.0.0.1:${PORT}${target}`);
+    const missing = wanted.filter((name) => !response.headers.get(name));
+    if (missing.length) weak.push(`${target}: no ${missing.join("/")}`);
+  }
+  return weak.length ? fail(weak.join(" | ")) : ok(true, `${targets.length} routes, identical headers`);
+});
+
+check("a crawler sees each route's own title and Open Graph data", async () => {
+  // Crawlers and link unfurlers do not run JavaScript, so a head that is only set by
+  // `useDocumentHead` is invisible to exactly the readers it exists for.
+  const bad = [];
+  for (const [route, title] of [
+    ["/gates", "The two kill gates"],
+    ["/spine", "The shared spine"],
+    ["/docs", "Source documents"],
+  ]) {
+    const response = await probe(PORT, route);
+    const served = (response.text.match(/<title>([^<]*)<\/title>/) ?? [])[1] ?? "";
+    const og = response.text.includes(`og:title" content="${title}`);
+    const canonical = response.text.includes(`rel="canonical" href="http://127.0.0.1:${PORT}${route}"`);
+    if (response.status !== 200 || !served.startsWith(title) || !og || !canonical) {
+      bad.push(`${route} title="${served}" og=${og} canonical=${canonical}`);
+    }
+  }
+  return bad.length ? fail(bad.join(" | ")) : ok(true, "own title, og:title and canonical per route");
+});
+
+check("the not-found shell tells crawlers not to index it", async () => {
+  const response = await probe(PORT, "/no-such-stop");
+  const noindex = response.text.includes('name="robots" content="noindex');
+  return response.status === 404 && noindex
+    ? ok(true, "404 shell is served with noindex, follow")
+    : fail(`status ${response.status}, noindex=${noindex}`);
+});
+
+check("the README states the real number of audit checks", () => {
+  // This suite has outgrown its own documentation twice already; make the number a check
+  // rather than a promise.
+  const stated = [...read("README.md").matchAll(/\b(\d{2,4})\s+(?:numbered\s+)?checks\b/g)].map((m) =>
+    Number(m[1]),
+  );
+  if (!stated.length) return fail("README no longer states a check count");
+  const wrong = stated.filter((n) => n !== checks.length);
+  return wrong.length
+    ? fail(`README says ${wrong.join("/")} but the suite runs ${checks.length} checks`)
+    : ok(true, `${stated.length} mentions, all reading ${checks.length}`);
+});
+
+check("the print sheet has an affordance that reaches it", () => {
+  const primitive = read("packages/grin-ui/src/primitives/PrintButton.tsx");
+  const index = read("packages/grin-ui/src/index.ts");
+  const order = read("apps/grinlife/src/sections/legacy/Order.tsx");
+  if (!primitive.includes("window.print")) return fail("PrintButton never calls window.print");
+  if (!index.includes("PrintButton")) return fail("PrintButton is not exported from @grin/ui");
+  return order.includes("<PrintButton")
+    ? ok(true, "exported, guarded, and offered on the Legacy brief")
+    : fail("a print sheet no route offers is dead CSS");
+});
+
 // ---------------------------------------------------------------- run
 
 const results = [];

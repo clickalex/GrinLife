@@ -227,3 +227,67 @@
     transform: none;
   }
 }
+
+/*
+   * Print sheet.
+   *
+   * Grin Legacy's Phase-0 motion is concierge: somebody forwards this to a family and
+   * the family prints it. The screen chrome — sticky header, chapter rail, reveal
+   * animations, footer — is noise on paper, and a price separated from its contact
+   * line by a page break costs an order.
+   */
+@media print {
+  header,
+  footer,
+  nav,
+  .grin-skip-link {
+    display: none !important;
+  }
+
+  /* The chapter rail is a scrolling affordance; on paper it is a column of dead links. */
+  [aria-label="Chapters"],
+  [class*="sticky"] {
+    position: static !important;
+    display: none !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 11pt;
+  }
+
+  main section {
+    padding-block: 12pt !important;
+    break-inside: avoid-page;
+  }
+
+  /* Never split the thing somebody is deciding about. */
+  table,
+  figure,
+  [class*="rounded-lg"],
+  [class*="rounded-xl"] {
+    break-inside: avoid;
+  }
+
+  a {
+    color: #000 !important;
+    text-decoration: underline;
+  }
+
+  /* Show where an external link goes, since it cannot be clicked. */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 8pt;
+    color: #444;
+  }
+
+  a[href^="#"]::after,
+  a[href^="/"]::after {
+    content: "";
+  }
+}

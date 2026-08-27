@@ -58,7 +58,7 @@ export default function App() {
   const path = usePath();
 
   // Eight routes share one HTML shell; the head has to follow the router.
-  useDocumentHead({ title: pageTitleFor(path), description: pageDescriptionFor(path) });
+  useDocumentHead({ title: pageTitleFor(path), description: pageDescriptionFor(path), path });
 
   return (
     <ErrorBoundary>

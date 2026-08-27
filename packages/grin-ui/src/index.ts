@@ -33,6 +33,7 @@ export { DataTable, TermTable } from "./primitives/DataTable";
 export { Stat, StatGrid } from "./primitives/Stat";
 export { Accordion, type AccordionItem } from "./primitives/Accordion";
 export { Tabs, type TabItem } from "./primitives/Tabs";
+export { PrintButton } from "./primitives/PrintButton";
 export { SkipLink } from "./primitives/SkipLink";
 export { Reveal } from "./primitives/Reveal";
 export { ErrorBoundary } from "./primitives/ErrorBoundary";

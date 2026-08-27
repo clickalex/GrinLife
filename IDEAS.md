@@ -87,6 +87,11 @@ when the first city is chosen, not before.
 
 ## 5. Sitemap, robots and Open Graph — the site is public now
 
+> **Implemented.** `/sitemap.xml` and `/robots.txt` are generated from `routes`; per-route
+> `og:title`/`og:description`/`og:type`/`og:url`/`og:site_name`, `twitter:card` and
+> `rel="canonical"` are injected into the shell **server-side**, because crawlers and link
+> unfurlers do not run JavaScript. Covered by audit checks 106, 107 and 112–114.
+
 **The gap.** Eight routes, per-route titles and descriptions, and still no `sitemap.xml`, no
 `robots.txt`, and no Open Graph tags. Sharing `/products/legacy` produces a bare link with no
 title or image. For a site whose entire job is to be read and forwarded, that is a real miss.
@@ -103,6 +108,11 @@ It does not help make a gate decision.
 ---
 
 ## 6. A print sheet for the Legacy brief
+
+> **Implemented**, both halves. An `@media print` block in `tokens.css` drops the
+> header, footer, rail and skip link, goes black-on-white at 11pt, keeps blocks together with
+> `break-inside: avoid`, and prints external hrefs after their links. The Legacy-only
+> affordance is shipped too, as the shared `PrintButton` primitive.
 
 **The gap.** Grin Legacy's Phase-0 brief is one page: sample stories, one price, one CTA,
 concierge. In practice someone forwards it to a family, and a family prints it. The screen
@@ -248,6 +258,10 @@ spending against a product the gates have not endorsed.
 ---
 
 ## 14. A seam test between the content, API and gate UI
+
+> **Implemented** as `apps/grinlife/src/Seam.test.tsx`: for all 9 criteria across both gates it
+> asserts the page renders a control, that a PATCH is accepted with 200, and that the verdict
+> then counts every one as met. Verified to fail when the DOM id contract is renamed.
 
 **The gap.** Three packages have to agree on criterion identity: `inputsForGate` in `@grin/content`
 defines them, `@grin/api` validates a PATCH against them, and `/gates` renders an input for each.

@@ -1,4 +1,15 @@
-import { ButtonLink, Callout, Card, Eyebrow, Heading, Lede, Section, accentOf, cn } from "@grin/ui";
+import {
+  ButtonLink,
+  Callout,
+  Card,
+  Eyebrow,
+  Heading,
+  Lede,
+  PrintButton,
+  Section,
+  accentOf,
+  cn,
+} from "@grin/ui";
 import { legacyPricing } from "@grin/content";
 
 const bookTier = legacyPricing.find((tier) => tier.featured) ?? legacyPricing[1]!;
@@ -69,6 +80,9 @@ export function Order() {
             <ButtonLink href="#legacy-pricing" variant="outline" size="lg">
               See all three tiers
             </ButtonLink>
+            {/* Phase 0 is sold by hand, and the brief gets forwarded to a family that
+                reads it on paper — so the print sheet needs an affordance to reach it. */}
+            <PrintButton size="lg" accent="honey" label="Print the brief" />
           </div>
 
           <Callout tone="note" label="Why there is no checkout button">
