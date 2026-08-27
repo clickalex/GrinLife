@@ -240,10 +240,10 @@ four original implementations. Removing them is a one-line change if that is wan
 
 ## Part 4 — The hundred-check audit
 
-`scripts/audit.mjs` runs one hundred numbered checks over the repository, the build, the
+`scripts/audit.mjs` runs 105 numbered checks over the repository, the build, the
 live production server and the content model, printing the value each one observed.
-`npm run verify` now ends with it, so a regression in any of the hundred fails the gate.
-`AUDIT.md` is the last run: **100/100**.
+`npm run verify` now ends with it, so a regression in any of the 105 fails the gate.
+`AUDIT.md` is the last run: **105/105**.
 
 ### Six behavioural defects it found, and the fixes
 
@@ -283,8 +283,54 @@ resolves encoded dot segments before the request leaves the test.
 
 | Check                    | Result                                                                                       |
 | ------------------------ | -------------------------------------------------------------------------------------------- |
-| `npm run verify`         | exit 0 — typecheck, tests, build and audit in one pass                                       |
+| `npm run verify`         | exit 0 — typecheck, tests, build and the 105-check audit in one pass                         |
 | `vitest run`             | **194 passed, 0 failed**, 8 test files                                                       |
-| `node scripts/audit.mjs` | **100/100 checks pass**                                                                      |
+| `node scripts/audit.mjs` | **105/105 checks pass**                                                                      |
+| `npm run audit:streak`   | **10 consecutive clean passes + confirmation**, 11 clean audits in a row (`AUDIT-STREAK.md`) |
 | `npm run build`          | 40.75 kB CSS (7.88 kB gzip), 383.26 kB JS (**119.94 kB gzip**), server bundle 50.8 kB        |
 | Live production server   | `:4321` — 8 routes 200, unknown path 404, deep links resolve, gate round-trip 4/4 then reset |
+
+## Part 5 — Repeated audit, and what repetition is worth
+
+`npm run audit:streak` runs the whole audit — typecheck, the test suite, a production build
+and a live server — until it records **10 consecutive clean passes**. Any failing attempt
+resets the streak to zero rather than being skipped.
+
+**Result: 10 consecutive clean passes, plus a confirmation run — 11 clean audits in a row,
+105/105 checks each, 33–37 s per attempt.** Eleven runs therefore also means eleven
+consecutive passes of the 194-test suite and eleven clean builds. `AUDIT-STREAK.md` is the log.
+
+The harness now runs one extra audit _after_ writing its own report, because the first version
+did not and that turned out to matter.
+
+What repetition actually bought, and what it did not:
+
+| Finding                                    | Detail                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The streak harness poisoned the next audit | The first version wrote `AUDIT-STREAK.md` after its runs and then reported success — but the report is unformatted markdown in the tree, so audit check 30 failed on every subsequent run. Ten passes had been recorded against a _stale_ report file. Fixed by ignoring the generated report and adding a confirmation run that has to pass with the report in place; the streak was then re-run from scratch. |
+| A leaked child process                     | An interrupted audit left its server listening on `:4321`. Every later run then probed that stale process and could pass for the wrong reason. Cleanup now runs on every exit path, and a busy port is a hard failure. Verified by holding the port and watching check 75 fail.                                                                                                                                 |
+| Dead code in the public API                | `useReducedMotion` was exported and consumed by nothing. `Reveal` now uses it, so a visitor who asks for no motion never receives the animation node at all rather than a 0.001 ms one.                                                                                                                                                                                                                         |
+| Nothing else                               | The remaining runs were equivalent in outcome. That is the useful result: the checks are deterministic, so a future failure means a regression and not a race.                                                                                                                                                                                                                                                  |
+
+**What the streak does not prove.** It shows the 105 checks are stable and that nothing
+regressed across eleven full build-test-serve cycles. It says nothing about defects the checks
+do not look for. Ten passes of a blind spot is still a blind spot — and the harness defect
+above is the concrete example: every one of those runs was clean while the repository was, in
+fact, in a state that failed.
+
+### Five checks added before the streak, so the streak meant more
+
+| #   | Check                                               | Why                                                                      |
+| --- | --------------------------------------------------- | ------------------------------------------------------------------------ |
+| 101 | Every `@grin/ui` export is referenced somewhere     | This is what caught `useReducedMotion`                                   |
+| 102 | Reduced motion honoured in CSS _and_ in a component | A global CSS rule alone would have hidden the dead hook                  |
+| 103 | No `console.log` in the shipped bundle              | Source-level greps miss what the bundler inlines                         |
+| 104 | Every price in the content model is well-formed     | ₹ strings appear in marketing copy, tables and the plan                  |
+| 105 | Every browser-storage key is namespaced             | Three keys, all `grinlife:`; a fourth from a shared domain would collide |
+
+### Ideas, not a backlog
+
+`IDEAS.md` proposes eight features, each judged against the plan rather than against what is
+easy, and closes with what would deliberately _not_ be built. The short version: gate decision
+history, fake-door intent capture, then a sitemap — because the first two make a gate decision
+easier to make and the third makes the argument reachable.

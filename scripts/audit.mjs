@@ -721,7 +721,43 @@ section("G. Live server");
 
 const PORT = 4321;
 let server = null;
+
+// An interrupted run used to leave the child server listening on :4321, and the next
+// run would probe that stale process and pass for the wrong reason. Cleanup now happens
+// on every exit path, and a busy port is a hard failure rather than a quiet reuse of
+// somebody else's server.
+const stopServer = () => {
+  if (!server) return;
+  server.kill("SIGKILL");
+  server = null;
+};
+process.on("exit", stopServer);
+for (const signal of ["SIGINT", "SIGTERM"]) {
+  process.on(signal, () => {
+    stopServer();
+    process.exit(130);
+  });
+}
+
+const portInUse = async () => {
+  const net = await import("node:net");
+  return new Promise((resolve) => {
+    const socket = net.connect(PORT, "127.0.0.1");
+    socket.setTimeout(500);
+    socket.once("connect", () => {
+      socket.destroy();
+      resolve(true);
+    });
+    socket.once("error", () => resolve(false));
+    socket.once("timeout", () => {
+      socket.destroy();
+      resolve(false);
+    });
+  });
+};
+
 const startServer = async () => {
+  if (await portInUse()) return "busy";
   const { spawn } = await import("node:child_process");
   server = spawn("node", ["apps/grinlife/dist/index.js"], {
     cwd: root,
@@ -744,7 +780,12 @@ const startServer = async () => {
 check("the production server starts and serves the build", async () => {
   fs.rmSync("/tmp/grin-audit-gates.json", { force: true });
   const started = await startServer();
-  return started ? ok(true, `listening on :${PORT}`) : fail("server never answered /api/health");
+  if (started === "busy") {
+    return fail(`port ${PORT} is already in use — a previous audit did not clean up after itself`);
+  }
+  return started
+    ? ok(true, `listening on :${PORT}, port verified free first`)
+    : fail("server never answered /api/health");
 });
 
 check("all eight routes return 200 in production", async () => {
@@ -973,6 +1014,76 @@ check("the repository is on a tracked branch with an upstream", () => {
   return upstream ? ok(true, `${branch} → ${upstream}`) : fail(`${branch} has no upstream`);
 });
 
+// --- I. Design-system integrity
+section("I. Design-system integrity");
+
+check("every @grin/ui export is actually used somewhere", () => {
+  const index = read("packages/grin-ui/src/index.ts");
+  const names = new Set(
+    [...index.matchAll(/export \{([^}]+)\}/g)]
+      .flatMap((m) => m[1].split(","))
+      .map((part) => part.trim())
+      .filter((part) => part && !part.startsWith("type "))
+      .map((part) => part.split(" as ").pop() ?? ""),
+  );
+  const files = sourceFiles();
+  const definitions = new Map();
+  for (const file of files.filter((f) => f.startsWith("packages/grin-ui/"))) {
+    const text = read(file);
+    for (const name of names) {
+      if (new RegExp(`export (function|const|class) ${name}\\b`).test(text)) definitions.set(name, file);
+    }
+  }
+  const dead = [];
+  for (const [name, home] of definitions) {
+    const usedElsewhere = files.some((file) => file !== home && new RegExp(`\\b${name}\\b`).test(read(file)));
+    if (!usedElsewhere) dead.push(name);
+  }
+  return dead.length
+    ? fail(`exported but referenced nowhere else: ${dead.join(", ")}`)
+    : ok(true, `${definitions.size} defined exports, all reachable`);
+});
+
+check("reduced motion is honoured in CSS and in a component", () => {
+  const css = read("packages/grin-ui/src/styles/tokens.css");
+  const reveal = read("packages/grin-ui/src/primitives/Reveal.tsx");
+  const inCss = css.includes("prefers-reduced-motion: reduce");
+  const inComponent = reveal.includes("useReducedMotion");
+  if (!inCss) return fail("no prefers-reduced-motion rule in tokens.css");
+  return inComponent
+    ? ok(true, "global CSS rule + Reveal skips the animation entirely")
+    : fail("the hook exists but no component consumes it");
+});
+
+check("the shipped bundle contains no console.log", () => {
+  const dir = path.resolve(root, "apps/grinlife/dist/public/assets");
+  const js = fs.readdirSync(dir).find((f) => f.endsWith(".js"));
+  const count = (read(`apps/grinlife/dist/public/assets/${js}`).match(/console\.log/g) ?? []).length;
+  return count === 0 ? ok(true, "0 calls in the bundle") : fail(`${count} calls shipped`);
+});
+
+check("every price in the content model is well-formed", () => {
+  const bad = [];
+  for (const file of sourceFiles().filter((f) => f.startsWith("packages/grin-content/"))) {
+    for (const [, price] of read(file).matchAll(/"(₹[^"]*)"/g)) {
+      if (!/^₹[\d,k]+\+?(\/(yr|mo))?$/.test(price)) bad.push(`${path.basename(file)}: "${price}"`);
+    }
+  }
+  return bad.length
+    ? fail(bad.slice(0, 4).join(", "))
+    : ok(true, "every ₹ price is digits and thousands separators");
+});
+
+check("every browser-storage key is namespaced to this app", () => {
+  const keys = new Set();
+  for (const file of sourceFiles()) {
+    for (const [, , key] of read(file).matchAll(/useLocalStorage(<[^>]*>)?\(\s*"([^"]+)"/g)) keys.add(key);
+  }
+  const bad = [...keys].filter((key) => !key.startsWith("grinlife:"));
+  if (!keys.size) return fail("no useLocalStorage keys found — the check is not reading anything");
+  return bad.length ? fail(`unnamespaced: ${bad.join(", ")}`) : ok(true, [...keys].join(", "));
+});
+
 // ---------------------------------------------------------------- run
 
 const results = [];
@@ -986,7 +1097,7 @@ for (const item of checks) {
   results.push({ ...item, ...result });
 }
 
-if (server) server.kill("SIGTERM");
+stopServer();
 
 const failed = results.filter((r) => !r.pass);
 

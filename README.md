@@ -27,8 +27,9 @@ Checks:
 ```bash
 npm run typecheck  # tsc --noEmit across every package and the app
 npm test           # 194 tests: content, gate logic, API, components, routes, site audit
-npm run audit      # 100 checks over the repo, the build, the live server and the content model
-npm run audit:md   # the same 100 checks, written to AUDIT.md
+npm run audit      # 105 checks over the repo, the build, the live server and the content model
+npm run audit:md   # the same 105 checks, written to AUDIT.md
+npm run audit:streak  # run until 10 consecutive clean passes; a failure resets the streak
 npm run verify     # typecheck + test + build + audit
 ```
 
@@ -110,7 +111,7 @@ restored for real, `ProductSite`'s `landing` prop makes the split reversible —
 
 ## The audit
 
-`npm run audit` runs one hundred numbered checks and prints what each one observed:
+`npm run audit` runs 105 numbered checks and prints what each one observed:
 
 | Group                 | What it covers                                                                                                                     |
 | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
@@ -125,6 +126,10 @@ restored for real, `ProductSite`'s `landing` prop makes the split reversible —
 
 `AUDIT.md` is the last run. The audit found six behavioural defects and three hygiene
 items, all fixed — `ROADMAP.md` Part 4 records each one and why it mattered.
+
+`npm run audit:streak` runs the whole audit repeatedly until it gets **10 consecutive clean
+passes**; any failing attempt resets the streak to zero, because an audit that passes nine
+times out of ten is reporting a race, not a pass. `AUDIT-STREAK.md` is the last streak.
 
 Two things to know before running it elsewhere: it needs a git checkout (it enumerates
 tracked files with `git ls-files`), and it boots its own production server on `:4321` with a
