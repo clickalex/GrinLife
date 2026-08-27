@@ -147,16 +147,136 @@ report a problem to. Generated from the same audit data where possible, so it ca
 
 ---
 
+## Round two
+
+A second pass, deliberately avoiding the eight above. The filter is unchanged: does it make a
+gate decision easier to make, or the relay hand-off cheaper?
+
+---
+
+## 9. Unit economics behind Gate 1's margin criterion
+
+**The gap.** Gate 1 has three numeric criteria: 250 customers, **50% margin**, 60% repeat-or-referral.
+The site publishes the price (₹6,999 and the add-ons) but not what a book costs to make. So the
+margin criterion — the one that decides whether Legacy funds the next wave — is entered by hand as
+a percentage, with no arithmetic behind it that anyone can check.
+
+**What to build.** A `unitEconomics` record in `@grin/content`: price, print, binding, shipping,
+payment fees, and the derived margin. Rendered as a small table on `/products/legacy`, and the
+Gate 1 margin input pre-fills from it rather than being typed blind.
+
+**Cost.** Small — one data record, one `DataTable`, one wiring change in `Gates.tsx`.
+
+**Why it fits.** It is distinct from the cost-model calculator (#3): that one stress-tests the
+whole relay; this one makes a single gate criterion arithmetically honest.
+
+---
+
+## 10. The consent artefact Legacy actually owes a family
+
+**The gap.** The compliance table lists DPDP obligations as things that must be live at launch.
+But Grin Legacy collects a dead person's voice and stories from a living relative. That needs a
+signed, dated, per-order record of what was consented to, what is stored, for how long, and how it
+gets deleted. Nothing in the repo produces one.
+
+**What to build.** A printable consent-and-retention sheet generated per order: the fields, the
+retention window, the deletion route, and a signature block. Same print machinery as #6, and the
+text comes from the existing compliance data rather than being written twice.
+
+**Cost.** Small to build. The hard part is getting the retention wording right, which is a legal
+question rather than a code one.
+
+**Why it is on this list at all.** It is the cheapest item here that converts a stated obligation
+into an artefact that exists. Everything else in the compliance table is a promise; this is a form.
+
+---
+
+## 11. Make "kill the product" a procedure, not a slogan
+
+**The gap.** The plan is unusually honest that products get killed after two gate failures, and the
+site renders `antiDriftState` prominently. But nowhere defines what killing a product _means_
+operationally. When the day comes, that decision gets made under stress by people who have never
+rehearsed it.
+
+**What to build.** A `killProcedure` record — stop spend, notify the waitlist with a real refund
+route, archive the repo, sunset the domain, publish the post-mortem — rendered on `/roadmap` as a
+checklist, with an audit check that every step has an owner field filled in.
+
+**Cost.** Small. The value is that it is written _before_ it is needed.
+
+**Watch out.** Do not automate it. A kill decision is a human one; the checklist exists so the
+human can execute it cleanly at 2am.
+
+---
+
+## 12. The relay hand-off contract
+
+**The gap.** `handsNextWave` is a field on every product, and the roadmap site renders it. It says
+_what_ each wave hands on. It does not say what the receiving wave is entitled to expect, or how
+anyone would know the hand-off happened.
+
+**What to build.** An explicit contract per hand-off — Wave 1 must deliver a verified-adult
+pipeline, payment rails and moderation staffing before Wave 2 may start — as a `SpineRow`-shaped
+table on `/spine` with a status per item. Wave 2's gate then references the contract instead of
+re-deriving it.
+
+**Cost.** Medium. Mostly a decision about what belongs in the contract; the rendering is a table
+that already exists.
+
+**Why it fits.** The whole portfolio thesis is that the waves share one spine. A contract is how a
+shared spine survives contact with three separate teams.
+
+---
+
+## 13. Hindi, for the market the prices already assume
+
+**The gap.** Every price is in rupees, the governing law is the DPDP Act, and the compliance rows
+cite Indian regulators — but all copy is English. Grin Legacy sells memory books to families, which
+in India means vernacular-first or it means a much narrower market than the plan assumes.
+
+**What to build.** A `locale` layer in `@grin/content`: every user-facing string keyed, `en` plus
+`hi` to start, with the route-level language switch reusing the `useLocalStorage` pattern already
+behind the dual-view toggle. Marketing sections first; the plan-facing chapters can stay English
+longer, because their readers are different people.
+
+**Cost.** The largest item on either list. Translation of ~40 pages of considered copy is not a
+weekend, and machine translation of grief-adjacent marketing is worse than none.
+
+**Honest recommendation.** Do not start this until Legacy has 250 customers. Before that it is
+spending against a product the gates have not endorsed.
+
+---
+
+## 14. A seam test between the content, API and gate UI
+
+**The gap.** Three packages have to agree on criterion identity: `inputsForGate` in `@grin/content`
+defines them, `@grin/api` validates a PATCH against them, and `/gates` renders an input for each.
+Nothing asserts all three are in step. Add a criterion to the data and the UI can silently render
+nine inputs while the API accepts ten.
+
+**What to build.** One test: for every input of every gate, assert it renders on `/gates`, that a
+PATCH for it returns 200, and that the verdict moves. Roughly twenty lines, and it closes the seam
+the whole shared-spine argument depends on.
+
+**Cost.** Small. Probably the best value-per-line on either list.
+
+---
+
 ## What I would do first, and why
 
-**1 → 2 → 5.** The gate history closes a rule the plan states and the code only half-honours.
-Intent capture gives Gate 1's headline number a counter instead of an inbox. Both are small,
-both reuse the existing API and components without extending them, and both make the site do
-the thing it claims to do: measure rather than assert. The sitemap is cheap and it makes the
-argument reachable, so it goes in the same pass.
+Across both rounds, the order is **14 → 1 → 2 → 9 → 5**.
 
-Everything else waits for a reason to exist — real city data for 4, an expectation that the
-documents will change for 7, and a reader who needs 6 before it is worth the CSS.
+14 first because it is twenty lines and it guards the seam the entire shared-spine argument rests
+on. Then 1, because gate history closes a rule the plan states and the code only half-honours. Then
+2, because Gate 1's headline number deserves a counter rather than an inbox. Then 9, because a
+margin criterion typed in by hand is not a measurement. The sitemap (5) rides along in the same
+pass because it is cheap and it makes the argument reachable.
+
+10 and 11 go together the moment Legacy takes its first real order: one produces the artefact the
+law expects, the other makes the worst-case decision executable.
+
+Everything else waits for a reason to exist — real city data for 4, an expectation that the source
+documents will change for 7, a reader who needs 6, and 250 customers before 13.
 
 ## What I would deliberately not build
 

@@ -11,17 +11,17 @@ build and a live server booted on :4321.
 
 | Attempt | Result | Time | Checks | Streak after |
 |---|---|---|---|---|
-| 1 | ✅ pass | 33.5s | 105/105 checks pass | 1/10 |
-| 2 | ✅ pass | 33.0s | 105/105 checks pass | 2/10 |
+| 1 | ✅ pass | 35.3s | 105/105 checks pass | 1/10 |
+| 2 | ✅ pass | 34.2s | 105/105 checks pass | 2/10 |
 | 3 | ✅ pass | 33.4s | 105/105 checks pass | 3/10 |
-| 4 | ✅ pass | 33.4s | 105/105 checks pass | 4/10 |
-| 5 | ✅ pass | 33.7s | 105/105 checks pass | 5/10 |
-| 6 | ✅ pass | 33.0s | 105/105 checks pass | 6/10 |
-| 7 | ✅ pass | 34.3s | 105/105 checks pass | 7/10 |
-| 8 | ✅ pass | 33.9s | 105/105 checks pass | 8/10 |
-| 9 | ✅ pass | 37.1s | 105/105 checks pass | 9/10 |
-| 10 | ✅ pass | 36.6s | 105/105 checks pass | 10/10 |
+| 4 | ✅ pass | 34.8s | 105/105 checks pass | 4/10 |
+| 5 | ✅ pass | 35.1s | 105/105 checks pass | 5/10 |
+| 6 | ✅ pass | 36.0s | 105/105 checks pass | 6/10 |
+| 7 | ✅ pass | 34.4s | 105/105 checks pass | 7/10 |
+| 8 | ✅ pass | 34.3s | 105/105 checks pass | 8/10 |
+| 9 | ✅ pass | 33.8s | 105/105 checks pass | 9/10 |
+| 10 | ✅ pass | 33.7s | 105/105 checks pass | 10/10 |
 
 **Confirmation run** — executed after this file was written, so the audit sees its own
 output in the tree: ✅ pass, 105/105 checks pass,
-35.8s.
+35.5s.
