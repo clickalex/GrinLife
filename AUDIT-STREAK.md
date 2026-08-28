@@ -11,27 +11,27 @@ build and a live server booted on :4321.
 
 | Attempt | Result | Time | Checks | Streak after |
 |---|---|---|---|---|
-| 1 | ✅ pass | 46.2s | 122/122 checks pass | 1/20 |
-| 2 | ✅ pass | 46.3s | 122/122 checks pass | 2/20 |
-| 3 | ✅ pass | 49.0s | 122/122 checks pass | 3/20 |
-| 4 | ✅ pass | 44.2s | 122/122 checks pass | 4/20 |
-| 5 | ✅ pass | 45.4s | 122/122 checks pass | 5/20 |
-| 6 | ✅ pass | 45.1s | 122/122 checks pass | 6/20 |
-| 7 | ✅ pass | 43.0s | 122/122 checks pass | 7/20 |
-| 8 | ✅ pass | 43.9s | 122/122 checks pass | 8/20 |
-| 9 | ✅ pass | 44.8s | 122/122 checks pass | 9/20 |
-| 10 | ✅ pass | 45.8s | 122/122 checks pass | 10/20 |
-| 11 | ✅ pass | 44.6s | 122/122 checks pass | 11/20 |
-| 12 | ✅ pass | 46.7s | 122/122 checks pass | 12/20 |
-| 13 | ✅ pass | 45.2s | 122/122 checks pass | 13/20 |
-| 14 | ✅ pass | 45.4s | 122/122 checks pass | 14/20 |
-| 15 | ✅ pass | 44.9s | 122/122 checks pass | 15/20 |
-| 16 | ✅ pass | 45.3s | 122/122 checks pass | 16/20 |
-| 17 | ✅ pass | 45.1s | 122/122 checks pass | 17/20 |
-| 18 | ✅ pass | 45.6s | 122/122 checks pass | 18/20 |
-| 19 | ✅ pass | 45.2s | 122/122 checks pass | 19/20 |
-| 20 | ✅ pass | 44.6s | 122/122 checks pass | 20/20 |
+| 1 | ✅ pass | 46.7s | 127/127 checks pass | 1/20 |
+| 2 | ✅ pass | 50.6s | 127/127 checks pass | 2/20 |
+| 3 | ✅ pass | 49.4s | 127/127 checks pass | 3/20 |
+| 4 | ✅ pass | 43.7s | 127/127 checks pass | 4/20 |
+| 5 | ✅ pass | 44.2s | 127/127 checks pass | 5/20 |
+| 6 | ✅ pass | 45.9s | 127/127 checks pass | 6/20 |
+| 7 | ✅ pass | 45.0s | 127/127 checks pass | 7/20 |
+| 8 | ✅ pass | 46.1s | 127/127 checks pass | 8/20 |
+| 9 | ✅ pass | 46.2s | 127/127 checks pass | 9/20 |
+| 10 | ✅ pass | 44.8s | 127/127 checks pass | 10/20 |
+| 11 | ✅ pass | 44.0s | 127/127 checks pass | 11/20 |
+| 12 | ✅ pass | 43.8s | 127/127 checks pass | 12/20 |
+| 13 | ✅ pass | 46.0s | 127/127 checks pass | 13/20 |
+| 14 | ✅ pass | 44.5s | 127/127 checks pass | 14/20 |
+| 15 | ✅ pass | 47.0s | 127/127 checks pass | 15/20 |
+| 16 | ✅ pass | 45.3s | 127/127 checks pass | 16/20 |
+| 17 | ✅ pass | 44.6s | 127/127 checks pass | 17/20 |
+| 18 | ✅ pass | 45.9s | 127/127 checks pass | 18/20 |
+| 19 | ✅ pass | 46.9s | 127/127 checks pass | 19/20 |
+| 20 | ✅ pass | 46.6s | 127/127 checks pass | 20/20 |
 
 **Confirmation run** — executed after this file was written, so the audit sees its own
-output in the tree: ✅ pass, 122/122 checks pass,
-47.4s.
+output in the tree: ✅ pass, 127/127 checks pass,
+47.3s.

@@ -298,12 +298,19 @@ consecutive clean passes. Any failing attempt resets the streak to zero rather t
 skipped. It has been run to 10 and then to 20.
 
 **Latest result: 20 consecutive clean passes, plus a confirmation run — 21 clean audits in a
-row, 122/122 checks each, 43–49 s per attempt.** That is also 21 consecutive passes of the
+row, 127/127 checks each, 43.7–50.6 s per attempt.** That is also 21 consecutive passes of the
 254-test suite and 21 clean production builds. `AUDIT-STREAK.md` is the log.
 
-The 20-pass target has now been reached twice, against different codebases: once at 116 checks
-and 201 tests, and again after the eleven remaining `IDEAS.md` proposals were built, at 122
-checks and 254 tests. The first streak, at 105 checks and 194 tests, reached 10.
+The 20-pass target has now been reached three times, against three different codebases: at 116
+checks and 201 tests; at 122 checks and 254 tests, after the eleven remaining `IDEAS.md`
+proposals were built; and again at 127 checks after the deployment config and the AUDIT.md
+reproducibility fix. The first streak, at 105 checks and 194 tests, reached 10.
+
+Re-running it the third time was not a formality. The streak log had been asserting 122/122
+against a suite that was 127 checks wide, so the document in the tree described a codebase that
+no longer existed — exactly the drift the audit exists to catch, sitting in the file that
+records the audit. The counter was reset by the five new checks and the determinism fix and run
+again, rather than leaving a stale fixed-point claim behind.
 
 The harness now runs one extra audit _after_ writing its own report, because the first version
 did not and that turned out to matter.
