@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test / coverage
+coverage/
+.nyc_output/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*~
+
+# Gate status data (server-written, per deployment)
+apps/*/data/
+
+# GitHub Actions refuses workflow files pushed by a token without the `workflows`
+# scope, so the workflow lives at deploy/github-actions-ci.yml and is copied into
+# place. See README “Continuous integration”.
+.github/workflows/

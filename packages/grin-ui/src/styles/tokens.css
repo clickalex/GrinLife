@@ -1,0 +1,293 @@
+/**
+ * GrinLife "Lantern Trail" design tokens.
+ *
+ * Palette, type scale and radii are the system already chosen for this project in
+ * `Demo/grinlife_roadmap.zip → ideas.md`: soft parchment, deep ink, and four
+ * directional accents — sunlit coral (signature), moss (safe connection),
+ * twilight violet (thoughtful chance), honey (cherished memories).
+ *
+ * This file deliberately does NOT `@import "tailwindcss"`. Each app's CSS entry
+ * imports Tailwind, declares its `@source` globs, then imports this file — so the
+ * same tokens drive every Grin front-end without duplicating the theme.
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 8px);
+  --radius-md: calc(var(--radius) - 5px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 6px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --font-sans: "Nunito Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+
+@theme {
+  /* Directional accents. `coral` is the signature GrinLife colour. */
+  --color-coral: oklch(0.67 0.17 32);
+  --color-coral-deep: oklch(0.55 0.17 32);
+  --color-coral-soft: oklch(0.94 0.04 40);
+  --color-coral-ink: oklch(0.42 0.12 32);
+
+  --color-moss: oklch(0.58 0.1 152);
+  --color-moss-deep: oklch(0.46 0.1 152);
+  --color-moss-soft: oklch(0.94 0.035 145);
+  --color-moss-ink: oklch(0.36 0.07 152);
+
+  --color-violet: oklch(0.55 0.13 300);
+  --color-violet-deep: oklch(0.44 0.13 300);
+  --color-violet-soft: oklch(0.94 0.035 305);
+  --color-violet-ink: oklch(0.38 0.09 300);
+
+  --color-honey: oklch(0.72 0.14 75);
+  --color-honey-deep: oklch(0.58 0.14 70);
+  --color-honey-soft: oklch(0.95 0.055 85);
+  --color-honey-ink: oklch(0.4 0.08 68);
+
+  --color-parchment: oklch(0.98 0.012 72);
+  --color-parchment-deep: oklch(0.955 0.018 74);
+  --color-ink: oklch(0.26 0.035 258);
+  --color-ink-soft: oklch(0.48 0.032 258);
+
+  --shadow-lantern: 0 1px 2px oklch(0.26 0.035 258 / 0.05), 0 12px 32px -18px oklch(0.26 0.035 258 / 0.28);
+  --shadow-lift: 0 2px 4px oklch(0.26 0.035 258 / 0.06), 0 22px 44px -22px oklch(0.26 0.035 258 / 0.35);
+}
+
+:root {
+  --radius: 1.1rem;
+
+  --background: oklch(0.98 0.012 72);
+  --foreground: oklch(0.26 0.035 258);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.26 0.035 258);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.26 0.035 258);
+
+  --primary: oklch(0.67 0.17 32);
+  --primary-foreground: oklch(1 0 0);
+
+  --secondary: oklch(0.94 0.035 145);
+  --secondary-foreground: oklch(0.36 0.07 152);
+
+  --muted: oklch(0.955 0.018 74);
+  --muted-foreground: oklch(0.48 0.032 258);
+
+  --accent: oklch(0.95 0.055 85);
+  --accent-foreground: oklch(0.4 0.08 68);
+
+  --border: oklch(0.87 0.03 72);
+  --input: oklch(0.87 0.03 72);
+  --ring: oklch(0.67 0.17 32);
+}
+
+/* Night reading. Opt-in via `.dark` on <html>; the site defaults to parchment. */
+.dark {
+  --background: oklch(0.21 0.02 262);
+  --foreground: oklch(0.95 0.012 78);
+
+  --card: oklch(0.255 0.022 262);
+  --card-foreground: oklch(0.95 0.012 78);
+
+  --popover: oklch(0.255 0.022 262);
+  --popover-foreground: oklch(0.95 0.012 78);
+
+  --primary: oklch(0.72 0.16 35);
+  --primary-foreground: oklch(0.2 0.02 262);
+
+  --secondary: oklch(0.32 0.05 152);
+  --secondary-foreground: oklch(0.9 0.05 145);
+
+  --muted: oklch(0.28 0.02 262);
+  --muted-foreground: oklch(0.74 0.02 262);
+
+  --accent: oklch(0.33 0.06 80);
+  --accent-foreground: oklch(0.93 0.06 85);
+
+  --border: oklch(0.36 0.02 262);
+  --input: oklch(0.36 0.02 262);
+  --ring: oklch(0.72 0.16 35);
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before {
+    border-color: var(--border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: var(--color-coral-soft);
+    color: var(--color-coral-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    ::after,
+    ::before {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* Field-note paper used for dense reference blocks. */
+  .grin-paper {
+    background-image: linear-gradient(180deg, oklch(1 0 0 / 0.9), oklch(0.985 0.014 74 / 0.9));
+    box-shadow: var(--shadow-lantern);
+  }
+
+  /* Hairline rule that reads as a trail, not a divider. */
+  .grin-rule {
+    background-image: linear-gradient(90deg, var(--color-coral) 0 8px, transparent 8px 14px);
+    background-size: 14px 1px;
+    background-repeat: repeat-x;
+  }
+
+  /* Small caps label used for phase numbers, statuses and metrics. */
+  .grin-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .grin-reveal {
+    animation: grin-rise 620ms cubic-bezier(0.22, 0.8, 0.28, 1) both;
+  }
+}
+
+@keyframes grin-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
+   * Print sheet.
+   *
+   * Grin Legacy's Phase-0 motion is concierge: somebody forwards this to a family and
+   * the family prints it. The screen chrome — sticky header, chapter rail, reveal
+   * animations, footer — is noise on paper, and a price separated from its contact
+   * line by a page break costs an order.
+   */
+@media print {
+  header,
+  footer,
+  nav,
+  .grin-skip-link {
+    display: none !important;
+  }
+
+  /* The chapter rail is a scrolling affordance; on paper it is a column of dead links. */
+  [aria-label="Chapters"],
+  [class*="sticky"] {
+    position: static !important;
+    display: none !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 11pt;
+  }
+
+  main section {
+    padding-block: 12pt !important;
+    break-inside: avoid-page;
+  }
+
+  /* Never split the thing somebody is deciding about. */
+  table,
+  figure,
+  [class*="rounded-lg"],
+  [class*="rounded-xl"] {
+    break-inside: avoid;
+  }
+
+  a {
+    color: #000 !important;
+    text-decoration: underline;
+  }
+
+  /* Show where an external link goes, since it cannot be clicked. */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 8pt;
+    color: #444;
+  }
+
+  a[href^="#"]::after,
+  a[href^="/"]::after {
+    content: "";
+  }
+}

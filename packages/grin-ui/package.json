@@ -1,0 +1,24 @@
+{
+  "name": "@grin/ui",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "GrinLife design system \u2014 the Lantern Trail tokens, primitives, patterns and hooks shared by every Grin front-end.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./styles/tokens.css": "./src/styles/tokens.css"
+  },
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@grin/content": "*",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.544.0",
+    "tailwind-merge": "^3.3.1"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}
