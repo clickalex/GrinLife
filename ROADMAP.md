@@ -358,7 +358,62 @@ fact, in a state that failed.
 
 ### Ideas, not a backlog
 
-`IDEAS.md` proposes eight features, each judged against the plan rather than against what is
-easy, and closes with what would deliberately _not_ be built. The short version: gate decision
+`IDEAS.md` proposes fourteen features, each judged against the plan rather than against what is
+easy, and closes with what would deliberately _not_ be built. All fourteen are now built; each
+carries an `Implemented.` block naming the code and tests that shipped it. The short version: gate decision
 history, fake-door intent capture, then a sitemap — because the first two make a gate decision
 easier to make and the third makes the argument reachable.
+
+## Part 6 — Hosting and CI
+
+This site needs a Node host, and the reason is specific rather than a preference. `npm start`
+runs `dist/index.js`, which mounts the status API at `/api`, generates `/sitemap.xml` and
+`/robots.txt`, injects each route's `<head>` server-side, and returns a real 404 status. On a
+static host none of that exists, so the shipped surface collapses to nine identical
+client-rendered shells with the home page's title.
+
+Render is chosen and `render.yaml` is committed as a Blueprint. The one decision in it worth
+arguing about is the disk. Gate measurements, history and intent counts are JSON files written
+with `writeFileSync` and renamed atomically, so they need a filesystem that survives a restart.
+Render's free tier is ephemeral — it would appear to work and then lose every recorded gate
+decision on the next deploy — so the blueprint asks for `plan: starter`. That is real money for
+a portfolio site, and the honest alternative is recorded in the README: set `plan: free`, delete
+the `disk:` block, and accept that gate state lives in the browser only. The site already
+degrades that way deliberately and says so on screen, which is what makes the cheaper option
+tolerable rather than dishonest.
+
+`NODE_ENV=production` is set explicitly because the error handler includes `err.message` in
+responses unless it is. Leaving it unset would leak server paths on any 500 — the kind of detail
+that never appears in a local test and always appears in a screenshot.
+
+Vercel and Netlify are recorded as a poor fit rather than an oversight: their filesystems are
+read-only apart from an ephemeral `/tmp`, so the JSON store would lose data constantly. Hosting
+there needs `GateStore` and `IntentStore` moved onto a database, and both live in
+`packages/grin-api/src/store.ts`, so it is a contained change if that host is ever wanted.
+
+CI runs the developer's own command. `deploy/github-actions-ci.yml` executes `npm ci`,
+typecheck, tests, build, the audit and `npm audit` on every pull request, then regenerates
+`AUDIT.md` and fails if the committed copy had drifted. Check 100 — tracked branch with an
+upstream — reports a skip when `CI` is set, because a CI checkout is a detached merge ref and
+the check would otherwise fail every run for a reason that is not a defect.
+
+It lives in `deploy/` rather than at the magic path because of a permission, not a preference:
+GitHub refuses to let a GitHub App token without the `workflows` scope create
+`.github/workflows/ci.yml`, and the rejection takes the entire push with it. Committing it there
+made this branch unpushable. So the file is version-controlled where the token can reach, and
+the README gives the one-line copy that installs it. Check 125 asserts the installed copy is
+byte-identical to the canonical one whenever it exists, which is the part that matters — an
+out-of-date workflow is worse than none, because it reports green on a suite it never ran.
+
+Section L of the audit now guards the deployment itself, because deployment config rots quietly
+and nothing else would notice: a blueprint that stops starting the Node server, a
+`GRIN_DATA_FILE` moved off the disk mount, a CI workflow that silently stops running the audit,
+or an `.nvmrc` pinned below `engines.node`. That brings the suite to 127 checks.
+
+Writing the last of them found a real bug in the check itself. The version comparison did
+`pinned.split(".").map(Number) >= 0`, which coerces an array to `NaN` and so fails
+unconditionally — a green-looking check that was structurally incapable of passing. It was
+caught not by reasoning about the code but by giving it a deliberately bad `.nvmrc` of
+`18.20.0` and reading the failure it produced, which showed the right message for the wrong
+reason. Both new checks were then proven by breaking the thing they guard and confirming they
+bitten.

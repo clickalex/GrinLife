@@ -28,6 +28,9 @@ const sh = (command, args, options = {}) =>
   spawnSync(command, args, { cwd: root, encoding: "utf-8", timeout: 900_000, ...options });
 
 const read = (relative) => fs.readFileSync(path.resolve(root, relative), "utf-8");
+
+/** This script's own source, so a check can assert how the harness itself behaves. */
+const s_self = fs.readFileSync(fileURLToPath(import.meta.url), "utf-8");
 const exists = (relative) => fs.existsSync(path.resolve(root, relative));
 
 /** Every tracked file, minus the archive folder, which is a record rather than source. */
@@ -770,6 +773,27 @@ const portInUse = async () => {
   });
 };
 
+/**
+ * Every file the audit's server can write.
+ *
+ * `GateStore` keeps an append-only sidecar beside the state file —
+ * `state.json` → `state.history.json` — and that sidecar is the reason this list
+ * exists. Deleting only the state file leaves the history behind, so each audit
+ * run appended to the previous run's record and the history count grew by twelve
+ * entries forever. That made AUDIT.md unreproducible: two runs on an unchanged
+ * tree produced different files.
+ */
+const RUNTIME = {
+  gates: "/tmp/grin-audit-gates.json",
+  gatesHistory: "/tmp/grin-audit-gates.history.json",
+  intent: "/tmp/grin-audit-intent.json",
+};
+
+/** Remove every runtime file, so a run measures this tree and not the last run. */
+const cleanRuntimeState = () => {
+  for (const file of Object.values(RUNTIME)) fs.rmSync(file, { force: true });
+};
+
 const startServer = async () => {
   if (await portInUse()) return "busy";
   const { spawn } = await import("node:child_process");
@@ -779,10 +803,10 @@ const startServer = async () => {
       ...process.env,
       PORT: String(PORT),
       NODE_ENV: "production",
-      GRIN_DATA_FILE: "/tmp/grin-audit-gates.json",
+      GRIN_DATA_FILE: RUNTIME.gates,
       // Runtime state belongs in /tmp, not in the repository, for the same reason the
       // gate file does: an audit must not leave a deployment's data behind.
-      GRIN_INTENT_FILE: "/tmp/grin-audit-intent.json",
+      GRIN_INTENT_FILE: RUNTIME.intent,
     },
     stdio: "ignore",
   });
@@ -795,7 +819,7 @@ const startServer = async () => {
 };
 
 check("the production server starts and serves the build", async () => {
-  fs.rmSync("/tmp/grin-audit-gates.json", { force: true });
+  cleanRuntimeState();
   const started = await startServer();
   if (started === "busy") {
     return fail(`port ${PORT} is already in use — a previous audit did not clean up after itself`);
@@ -905,7 +929,7 @@ check("gate measurement round-trips through the API", async () => {
 });
 
 check("measurements persist to a file outside the build output", async () => {
-  const existsNow = fs.existsSync("/tmp/grin-audit-gates.json");
+  const existsNow = fs.existsSync(RUNTIME.gates);
   return existsNow ? ok(true, "written atomically by GateStore") : fail("no data file");
 });
 
@@ -1025,6 +1049,9 @@ check("the API is reachable only under /api", () => {
 });
 
 check("the repository is on a tracked branch with an upstream", () => {
+  // On CI the checkout is a detached merge ref by design, and the branch was necessarily
+  // pushed to get here, so the check would only ever produce a false failure.
+  if (process.env.CI) return ok(true, "CI checkout — branch state is not meaningful here");
   const branch = sh("git", ["rev-parse", "--abbrev-ref", "HEAD"]).stdout?.trim() ?? "";
   const upstream = sh("git", ["rev-parse", "--abbrev-ref", "@{u}"]).stdout?.trim() ?? "";
   if (!branch || branch === "HEAD") return fail("detached HEAD");
@@ -1313,9 +1340,7 @@ check("intent capture refuses an unknown product and stores no contact details",
     body: JSON.stringify({ product: "legacy", source: "audit", email: marker, phone: "9999999999" }),
   });
   if (accepted.status !== 201) return fail(`a valid ask answered ${accepted.status}`);
-  const stored = fs.existsSync("/tmp/grin-audit-intent.json")
-    ? fs.readFileSync("/tmp/grin-audit-intent.json", "utf-8")
-    : "";
+  const stored = fs.existsSync(RUNTIME.intent) ? fs.readFileSync(RUNTIME.intent, "utf-8") : "";
   const leaked = stored.includes(marker) || stored.includes("9999999999");
   return leaked
     ? fail("contact details were stored, creating a DPDP obligation the site does not need")
@@ -1345,6 +1370,111 @@ check("the locale layer ships a real translation, not a copy of the English", ()
   return test.includes("was not translated")
     ? ok(true, `${devanagari} Devanagari characters, and a test asserts they are not the English`)
     : fail("nothing asserts the Hindi differs from the English");
+});
+
+// --- L. Deployment
+
+section("L. Deployment");
+
+check("the Render blueprint boots the real server, not a static build", () => {
+  if (!fs.existsSync(path.resolve(root, "render.yaml"))) return fail("no render.yaml");
+  const yaml = read("render.yaml");
+  const problems = [];
+  if (!yaml.includes("startCommand: npm start")) problems.push("does not start the Node server");
+  if (!yaml.includes("healthCheckPath: /api/health")) problems.push("no health check on /api/health");
+  if (!yaml.includes("npm ci")) problems.push("installs with npm install instead of npm ci");
+  return problems.length ? fail(problems.join("; ")) : ok(true, "npm start, /api/health, npm ci");
+});
+
+check("the blueprint cannot leak error details or lose data silently", () => {
+  const yaml = read("render.yaml");
+  const problems = [];
+  // The app includes err.message in error responses unless NODE_ENV is production.
+  if (!/key: NODE_ENV\s*\n\s*value: production/.test(yaml))
+    problems.push("NODE_ENV is not pinned to production");
+
+  // Both data files must sit on the mounted disk, or they are written to the container
+  // filesystem and quietly reset on the next deploy.
+  const mount = (yaml.match(/mountPath:\s*(\S+)/) ?? [])[1];
+  if (!mount) problems.push("no disk mountPath declared");
+  for (const key of ["GRIN_DATA_FILE", "GRIN_INTENT_FILE"]) {
+    const value = (yaml.match(new RegExp(`key: ${key}\\s*\\n\\s*value:\\s*(\\S+)`)) ?? [])[1];
+    if (!value) problems.push(`${key} is not set`);
+    else if (mount && !value.startsWith(`${mount}/`))
+      problems.push(`${key}=${value} is outside the disk at ${mount}`);
+  }
+  return problems.length
+    ? fail(problems.join("; "))
+    : ok(true, `production mode, both data files on ${mount}`);
+});
+
+check("CI runs the same verification a developer runs", () => {
+  // The workflow's canonical home is deploy/, not .github/workflows/. GitHub
+  // refuses to accept a workflow file pushed by a token without the `workflows`
+  // scope, which is what a sandboxed GitHub App token has, so committing it at the
+  // magic path made the branch unpushable. It is version-controlled where it can
+  // be pushed and copied into place once, as the README describes.
+  const canonical = "deploy/github-actions-ci.yml";
+  if (!fs.existsSync(path.resolve(root, canonical))) return fail(`no ${canonical}`);
+  const yaml = read(canonical);
+  const needed = ["npm ci", "npm run typecheck", "npm test", "npm run build", "npm run audit"];
+  const missing = needed.filter((step) => !yaml.includes(step));
+  if (missing.length) return fail(`workflow does not run: ${missing.join(", ")}`);
+  if (!yaml.includes("pull_request")) return fail("workflow is not triggered by pull requests");
+
+  // Two copies of the same file drift. If the magic-path copy exists it must be
+  // byte-identical to the canonical one, or CI silently runs something else.
+  const live = ".github/workflows/ci.yml";
+  if (fs.existsSync(path.resolve(root, live)) && read(live) !== yaml)
+    return fail(`${live} has drifted from ${canonical} — copy it again`);
+
+  return ok(true, "pull requests run typecheck, tests, build and the audit");
+});
+
+check("the pinned Node version satisfies the declared engine", () => {
+  if (!fs.existsSync(path.resolve(root, ".nvmrc"))) return fail("no .nvmrc");
+  const pinned = read(".nvmrc").trim();
+  const pkg = JSON.parse(read("package.json"));
+  const required = pkg.engines?.node ?? "";
+  const minimum = (required.match(/(\d+)\.(\d+)\.(\d+)/) ?? [])[0];
+  if (!minimum) return fail(`engines.node is "${required}", which has no minimum to compare`);
+  const parts = (version) => version.split(".").map((part) => Number(part) || 0);
+  const [pinnedParts, minimumParts] = [parts(pinned), parts(minimum)];
+  let satisfies = 0;
+  for (let i = 0; i < Math.max(pinnedParts.length, minimumParts.length); i += 1) {
+    const difference = (pinnedParts[i] ?? 0) - (minimumParts[i] ?? 0);
+    if (difference !== 0) {
+      satisfies = difference;
+      break;
+    }
+  }
+  return satisfies >= 0
+    ? ok(true, `.nvmrc pins ${pinned}; engines requires ${required}`)
+    : fail(`.nvmrc pins ${pinned} but engines requires ${required}`);
+});
+
+check("the audit's cleanup covers every file the store can write", () => {
+  // GateStore derives an append-only sidecar from the state path: state.json ->
+  // state.history.json. Deleting only the state file left the sidecar behind, so
+  // every run appended to the last run's record and check 117's count grew by
+  // twelve forever. AUDIT.md could then never be reproduced, which is what broke
+  // the CI freshness step that compares the committed file against a fresh run.
+  const store = read("packages/grin-api/src/store.ts");
+  const sidecar = (store.match(/replace\(\/\\\.json\$\/,\s*"([^"]+)"\)/) ?? [])[1];
+  if (!sidecar) return fail("GateStore no longer derives a history path — re-read store.ts");
+
+  const names = Object.values(RUNTIME);
+  if (!names.includes(RUNTIME.gates) || !names.includes(RUNTIME.intent))
+    return fail("the state and intent files are not both cleaned");
+
+  const expected = RUNTIME.gates.replace(/\.json$/, sidecar);
+  if (!names.includes(expected)) return fail(`the sidecar ${expected} is not cleaned`);
+
+  // And the cleanup must actually run before the server boots.
+  if (!/cleanRuntimeState\(\);\s*\n\s*const started = await startServer\(\);/.test(s_self))
+    return fail("cleanRuntimeState() is no longer called before the server starts");
+
+  return ok(true, `state, history sidecar and intent are all cleared: ${names.length} files`);
 });
 
 // ---------------------------------------------------------------- run

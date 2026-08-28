@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# The audit boots a real server and runs the full suite, so a run takes a few minutes.
+# Cancelling a superseded run on the same ref is the cheap behaviour.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Typecheck, tests, build and the 122-check audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # npm ci, matching the deploy: a lockfile that cannot install cleanly is a defect.
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      # Runs the built server on :4321 and exercises it over HTTP. Check 100 (branch
+      # upstream) detects CI and skips, because a CI checkout is a detached merge ref.
+      - name: Audit
+        run: npm run audit -- --quiet
+
+      - name: Dependency vulnerabilities
+        run: npm audit --omit=dev --audit-level=moderate
+
+      - name: Confirm AUDIT.md is current
+        run: |
+          npm run audit:md --silent
+          if ! git diff --quiet AUDIT.md; then
+            echo "AUDIT.md is stale — run 'npm run audit:md' and commit it."
+            git diff --stat AUDIT.md
+            exit 1
+          fi
