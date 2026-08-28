@@ -18,12 +18,13 @@ import {
   Section,
   SectionChips,
   SectionRail,
-  SpineMatrix,
   Sources,
+  SpineMatrix,
   StatGrid,
   TermTable,
   accentOf,
   cn,
+  useLocale,
   type ChapterItem,
 } from "@grin/ui";
 import {
@@ -39,6 +40,7 @@ import {
   spineIntro,
   spinePayoff,
   spineRows,
+  translate,
 } from "@grin/content";
 import { Link } from "../router";
 
@@ -54,12 +56,14 @@ const chapters: ChapterItem[] = [
 ];
 
 export default function Home() {
+  const [locale] = useLocale();
+
   return (
     <>
       <PageHero
-        eyebrow={`Portfolio plan · ${portfolio.documentDate}`}
-        title={portfolio.headline}
-        lede={portfolio.lede}
+        eyebrow={`${translate(locale, "home.eyebrow")} · ${portfolio.documentDate}`}
+        title={translate(locale, "home.headline")}
+        lede={translate(locale, "home.lede")}
         badges={products.map((product) => (
           <Link
             key={product.id}

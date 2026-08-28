@@ -5,5 +5,5 @@
  * any Grin front-end (or a future ops dashboard) can mount the same endpoint and
  * read the same record.
  */
-export { GateStore } from "./store";
+export { GateStore, IntentStore } from "./store";
 export { createApiRouter } from "./router";

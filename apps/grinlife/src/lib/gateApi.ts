@@ -1,4 +1,4 @@
-import type { GateStatusRecord, GateVerdict } from "@grin/content";
+import type { GateHistoryEntry, GateStatusRecord, GateVerdict } from "@grin/content";
 
 /**
  * Client for the Grin status API.
@@ -13,6 +13,16 @@ export interface GatesPayload {
   gates: { id: string; month: number; question: string; unlocks: string }[];
   status: GateStatusRecord;
   verdicts: GateVerdict[];
+  /** The anti-drift verdict per gate, computed server-side from the recorded history. */
+  antiDrift?: Record<string, "clear" | "retry" | "killed">;
+  /** The append-only log the timeline renders. */
+  history?: GateHistoryEntry[];
+}
+
+export interface IntentPayload {
+  target: number;
+  counts: Record<string, number>;
+  lines: Record<string, string>;
 }
 
 async function request(path: string, init?: RequestInit): Promise<GatesPayload | null> {
@@ -75,5 +85,39 @@ export async function applyPatch(gateId: string, patch: GatePatch): Promise<Gate
       return setCriterionConfirmed(gateId, patch.n, patch.confirmed);
     case "note":
       return setCriterionNote(gateId, patch.n, patch.note);
+  }
+}
+
+/** Records a dated verdict on a gate — the only thing that counts as a failure. */
+export function assessGate(gateId: string) {
+  return request(`/api/gates/${gateId}/assess`, { method: "POST" });
+}
+
+/**
+ * Intent capture. Separate from `request` because it answers a different shape, and
+ * because a failed ask must never look like a recorded one — the caller only increments
+ * the number it shows when this resolves with a payload.
+ */
+export async function recordIntent(product: string, source = "site"): Promise<IntentPayload | null> {
+  try {
+    const response = await fetch("/api/intent", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ product, source }),
+    });
+    if (!response.ok) return null;
+    return (await response.json()) as IntentPayload;
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchIntent(): Promise<IntentPayload | null> {
+  try {
+    const response = await fetch("/api/intent");
+    if (!response.ok) return null;
+    return (await response.json()) as IntentPayload;
+  } catch {
+    return null;
   }
 }

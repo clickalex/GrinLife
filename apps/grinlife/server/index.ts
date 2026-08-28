@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { pageDescriptionFor, pageTitleFor, portfolio, routes } from "@grin/content";
-import { GateStore, createApiRouter } from "@grin/api";
+import { GateStore, IntentStore, createApiRouter } from "@grin/api";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -20,6 +20,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  */
 export function createApp(
   dataFile: string = process.env.GRIN_DATA_FILE ?? path.resolve(__dirname, "..", "data", "gate-status.json"),
+  intentFile: string = process.env.GRIN_INTENT_FILE ?? path.resolve(__dirname, "..", "data", "intent.json"),
 ) {
   const app = express();
   const publicDir = path.resolve(__dirname, "public");
@@ -33,7 +34,7 @@ export function createApp(
   app.disable("x-powered-by");
   app.use(express.json({ limit: "64kb" }));
 
-  app.use("/api", createApiRouter(new GateStore(dataFile)));
+  app.use("/api", createApiRouter(new GateStore(dataFile), new IntentStore(intentFile)));
 
   /**
    * Sitemap and robots, generated from the same `routes` table the client router uses,

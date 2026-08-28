@@ -5,18 +5,20 @@
 import {
   ButtonLink,
   Callout,
+  CostCalculator,
   Eyebrow,
   Heading,
   Lede,
   PageHero,
   PhaseCard,
+  ProcedureChecklist,
   RelayChart,
   Section,
   Tabs,
-  useLocalStorage,
   type TabItem,
+  useLocalStorage,
 } from "@grin/ui";
-import { antiDriftRule, gates, getPhases, products, relayRule } from "@grin/content";
+import { antiDriftRule, costClosing, gates, getPhases, products, relayRule } from "@grin/content";
 import { Link } from "../router";
 
 export default function Roadmap() {
@@ -153,6 +155,32 @@ export default function Roadmap() {
             <Callout tone="kill" title={antiDriftRule.rule}>
               <p>{antiDriftRule.gloss}</p>
             </Callout>
+          </div>
+        </div>
+      </Section>
+
+      <Section spacing="normal" tone="paper">
+        <div className="space-y-14">
+          <div className="space-y-5">
+            <div className="space-y-3">
+              <Eyebrow>§7 — Cost</Eyebrow>
+              <Heading size="title">The relay argument, under stress</Heading>
+              <Lede>{costClosing}</Lede>
+            </div>
+            <CostCalculator />
+          </div>
+
+          <div className="space-y-5">
+            <div className="space-y-3">
+              <Eyebrow>Anti-drift, in practice</Eyebrow>
+              <Heading size="title">What killing a product actually involves</Heading>
+              <Lede>
+                The plan says products die after two gate failures, and the live record of those failures is
+                on the gates page. This is what happens next — written down now, because the decision gets
+                made under stress by someone who has never rehearsed it.
+              </Lede>
+            </div>
+            <ProcedureChecklist />
           </div>
         </div>
       </Section>

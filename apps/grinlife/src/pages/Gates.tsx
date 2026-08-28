@@ -12,6 +12,7 @@ import {
   Card,
   Eyebrow,
   GateBoard,
+  GateTimeline,
   Heading,
   Lede,
   PageHero,
@@ -29,6 +30,7 @@ import {
 } from "@grin/content";
 import {
   applyPatch,
+  assessGate,
   fetchGates,
   resetAllGates,
   resetGate,
@@ -155,6 +157,26 @@ export default function Gates() {
     [online, setLocal, goOffline],
   );
 
+  /**
+   * A dated verdict. This is the only action that can fail a gate under the anti-drift
+   * rule — editing a criterion records a measurement, assessing records a decision.
+   */
+  const handleAssess = useCallback(
+    async (gateId: string) => {
+      if (!online) return;
+      setBusy(true);
+      const next = await assessGate(gateId);
+      setBusy(false);
+      if (next) {
+        latest.current = next.status;
+        setPayload(next);
+      } else {
+        goOffline();
+      }
+    },
+    [online, goOffline],
+  );
+
   const handleResetAll = useCallback(async () => {
     if (!online) {
       setLocal({});
@@ -239,6 +261,43 @@ export default function Gates() {
                 />
               );
             })}
+          </div>
+
+          <div className="space-y-5">
+            <div className="space-y-3">
+              <Eyebrow>Anti-drift</Eyebrow>
+              <Heading size="title">The record behind the rule</Heading>
+              <Lede>
+                0 failures proceed, 1 retry once, 2 kill. That cannot be read off the numbers above — a
+                criterion missed in March and corrected in June looks identical to one never missed. So every
+                measurement and every dated assessment is kept.
+              </Lede>
+            </div>
+
+            {online ? (
+              <div className="grid gap-6 lg:grid-cols-2">
+                {gates.map((gate) => (
+                  <GateTimeline
+                    key={gate.id}
+                    gateId={gate.id}
+                    gateLabel={`Gate ${gate.id.slice(-1)} · month ${gate.month}`}
+                    state={payload?.antiDrift?.[gate.id] ?? "clear"}
+                    entries={(payload?.history ?? []).filter((entry) => entry.gateId === gate.id)}
+                    onAssess={() => void handleAssess(gate.id)}
+                    busy={busy}
+                    accent={gate.id === "gate-1" ? "coral" : "violet"}
+                  />
+                ))}
+              </div>
+            ) : (
+              <Callout tone="note" label="The record lives on the server">
+                <p>
+                  History and the anti-drift verdict are stored with the measurements, so they are unavailable
+                  while no status API is reachable. Nothing has been lost — run the API and the record is
+                  exactly as it was.
+                </p>
+              </Callout>
+            )}
           </div>
 
           <div className="grid gap-5 lg:grid-cols-2">

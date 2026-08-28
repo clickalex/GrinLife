@@ -31,6 +31,14 @@ import type { AccentId, Phase, Product, ProductId } from "./types";
 
 export * from "./types";
 
+// Operating records, gate history, the published accessibility position and the locale
+// layer. Each is its own module so a front-end can import one without pulling the rest.
+export * from "./operations";
+export * from "./history";
+export * from "./accessibility";
+export * from "./locale";
+export * from "./provenance";
+
 export { gateInputs, gateIds, inputsForGate } from "./gateInputs";
 export {
   evaluateCriterion,
@@ -108,12 +116,19 @@ export const primaryNav: { label: string; href: string }[] = [
   { label: "Shared spine", href: "/spine" },
   { label: "Gates", href: "/gates" },
   { label: "Docs", href: "/docs" },
+  { label: "Accessibility", href: "/accessibility" },
 ];
 
 /** Every route the GrinLife app serves — used by tests and by the sitemap. */
-export const routes: string[] = ["/", "/roadmap", "/gates", "/spine", "/docs", "/404"].concat(
-  products.map((p) => p.route),
-);
+export const routes: string[] = [
+  "/",
+  "/roadmap",
+  "/gates",
+  "/spine",
+  "/docs",
+  "/accessibility",
+  "/404",
+].concat(products.map((p) => p.route));
 
 /** `<title>` and meta description for one route. */
 export interface PageMeta {
@@ -153,6 +168,11 @@ const staticPageMeta: Record<string, PageMeta> = {
     title: "Source documents",
     description:
       "The documents this site is transcribed from, with the duplication audit of the archives they replaced.",
+  },
+  "/accessibility": {
+    title: "Accessibility",
+    description:
+      "What this site guarantees about keyboard, screen-reader and motion support, what is known to be imperfect, and how to report a barrier.",
   },
   "/404": {
     title: "This stop does not exist",

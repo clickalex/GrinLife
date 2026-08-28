@@ -12,6 +12,11 @@ have not been built yet.
 
 ## 1. Gate decision history — the anti-drift rule needs it
 
+> **Implemented.** Every `PATCH` appends to an append-only history file; `POST /api/gates/:id/assess`
+> records a dated verdict, and only an assessment counts as a failure — editing a criterion twelve
+> times records twelve measurements and no failures. `antiDriftFromHistory` computes the verdict
+> and `/gates` renders the timeline. Covered by audit checks 117–118.
+
 **The gap.** The plan's anti-drift rule is: 0 gate failures → proceed, 1 → retry once,
 2 → kill the product. `@grin/content` exports `antiDriftState`, and the site renders it.
 But `@grin/api` stores only the _current_ value of each criterion. Nothing records that a
@@ -33,6 +38,10 @@ the codebase currently only half-implements.
 
 ## 2. Fake-door intent capture — Gate 1's 250 customers has no counter
 
+> **Implemented.** `POST /api/intent` counts an ask per product and stores **no contact details**,
+> so it creates no personal data and no DPDP obligation. Published as progress toward 250 rather
+> than a bare count, and only on the three product pages. Covered by audit checks 119–120.
+
 **The gap.** Gate 1's first criterion is 250 paying customers. Phase 0 is deliberately
 concierge: the CTAs are `mailto:` links. There is no record anywhere of how many people
 asked. So the criterion that gates the entire portfolio is measured by someone counting
@@ -51,6 +60,12 @@ threshold, or show progress rather than absolute counts until it clears.
 ---
 
 ## 3. Cost-model calculator — make the relay argument testable
+
+> **Implemented** as `CostCalculator` on `/roadmap`: four sliders recompute the relay arithmetic and
+> mark the row where it breaks. `costComparison` is transcribed prose and cannot be recomputed, so
+> this is an explicit model beside it, with every assumption's basis printed. Two defects were found
+> building it: the break test treated a cost row as a failure, and the moderation baseline was so low
+> the relay could never break.
 
 **The gap.** `costComparison` is six static rows transcribed from the plan. The argument it
 makes — _"Legacy funds Social, Social funds Serendipity, and the relay breaks if a margin
@@ -71,6 +86,10 @@ someone stress the numbers is the most in-character thing it could do.
 ---
 
 ## 4. GrinSocial city readiness — operationalising Gate 2
+
+> **Implemented**, with the honesty constraint the proposal raised. The shape is built and rendered
+> on `/products/social`; every waitlist reads **zero**, because no city has been chosen and a table of
+> plausible numbers would be exactly the fudging the gates exist to prevent.
 
 **The gap.** The plan sets ~500 waitlist per city, a 1,500-user launch, one city at a time.
 Gate 2 currently records five booleans. There is no place where "which city, how far along,
@@ -130,6 +149,11 @@ because the product's sales motion is literally paper.
 
 ## 7. Content provenance — prove the transcription still matches
 
+> **Implemented** as `provenance.ts` + `provenance.test.ts`: ten load-bearing figures, each paired
+> with the document it came from, and derived from the content model where they also live there — so
+> the check fails if the document changes _or_ if the package drifts away from the document. Runs
+> inside the test suite, which the audit runs, so it is part of every audit.
+
 **The gap.** Every string in `@grin/content` is transcribed from `Demo/DOCS/`. The tests
 check that the _structure_ holds and that the files exist. Nothing checks that the numbers
 still agree. If someone edits a source document, the site drifts silently.
@@ -144,6 +168,10 @@ only if the documents are expected to change; if they are frozen, skip it.
 ---
 
 ## 8. Publish the accessibility position
+
+> **Implemented** as the `/accessibility` route. Ten guarantees, each naming the test that enforces
+> it; `accessibility.test.ts` and audit check 121 fail if any of those names stops existing. Three
+> known imperfections are published, including that colour contrast is not machine-verified.
 
 **The gap.** The audit asserts one `h1` per page, no duplicate ids, alt text, table captions,
 heading order, a skip link, `aria-current`, and reduced-motion support. That is real work,
@@ -166,6 +194,10 @@ gate decision easier to make, or the relay hand-off cheaper?
 
 ## 9. Unit economics behind Gate 1's margin criterion
 
+> **Implemented** as `UnitEconomicsTable` on `/products/legacy`. The margin is derived from five cost
+> lines, each with its basis. On these estimates it lands at **54.1%** — clearing Gate 1's 50% floor
+> but missing the 55% the pricing note promises, which is the finding the table exists to surface.
+
 **The gap.** Gate 1 has three numeric criteria: 250 customers, **50% margin**, 60% repeat-or-referral.
 The site publishes the price (₹6,999 and the add-ons) but not what a book costs to make. So the
 margin criterion — the one that decides whether Legacy funds the next wave — is entered by hand as
@@ -183,6 +215,10 @@ whole relay; this one makes a single gate criterion arithmetically honest.
 ---
 
 ## 10. The consent artefact Legacy actually owes a family
+
+> **Implemented** as `ConsentSheet`, printable, on `/products/legacy`: what is collected, why, for how
+> long, how it is deleted, four undertakings, and a signature block. The retention wording is a legal
+> question and is written as a starting point, not as advice.
 
 **The gap.** The compliance table lists DPDP obligations as things that must be live at launch.
 But Grin Legacy collects a dead person's voice and stories from a living relative. That needs a
@@ -203,6 +239,10 @@ into an artefact that exists. Everything else in the compliance table is a promi
 
 ## 11. Make "kill the product" a procedure, not a slogan
 
+> **Implemented** as `ProcedureChecklist` on `/roadmap`: seven steps, each with an owner and the
+> evidence it leaves. `operations.test.ts` fails the build if a step appears without an owner.
+> Deliberately not interactive — a kill decision is a human one.
+
 **The gap.** The plan is unusually honest that products get killed after two gate failures, and the
 site renders `antiDriftState` prominently. But nowhere defines what killing a product _means_
 operationally. When the day comes, that decision gets made under stress by people who have never
@@ -220,6 +260,9 @@ human can execute it cleanly at 2am.
 ---
 
 ## 12. The relay hand-off contract
+
+> **Implemented** as a table on `/spine`: six obligations with from/to/evidence/status, five still
+> owed and one delivered (the monorepo itself).
 
 **The gap.** `handsNextWave` is a field on every product, and the roadmap site renders it. It says
 _what_ each wave hands on. It does not say what the receiving wave is entitled to expect, or how
@@ -239,6 +282,13 @@ shared spine survives contact with three separate teams.
 ---
 
 ## 13. Hindi, for the market the prices already assume
+
+> **Partly implemented, at the boundary the proposal drew.** The mechanism is built — a typed locale
+> layer, a shared store, a `<select>` in the header, and `<html lang>` following the choice, which
+> matters because screen readers pick a voice from it. Hindi covers navigation, the portfolio hero,
+> the shared chrome, the gate labels and Legacy's marketing layer. The plan-facing chapters stay
+> English on purpose: mistranslating a gate threshold is worse than not translating it, and the
+> proposal's own advice — do not start before 250 customers — still applies to the rest.
 
 **The gap.** Every price is in rupees, the governing law is the DPDP Act, and the compliance rows
 cite Indian regulators — but all copy is English. Grin Legacy sells memory books to families, which

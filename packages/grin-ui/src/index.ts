@@ -16,6 +16,7 @@ export { accents, accentOf, accentStyles, type Accent } from "./lib/accent";
 // hooks
 export { useReducedMotion } from "./hooks/useReducedMotion";
 export { useLocalStorage } from "./hooks/useLocalStorage";
+export { useLocale } from "./hooks/useLocale";
 export { useMediaQuery } from "./hooks/useMediaQuery";
 export { useScrollSpy } from "./hooks/useScrollSpy";
 export { useInView } from "./hooks/useInView";
@@ -34,6 +35,7 @@ export { Stat, StatGrid } from "./primitives/Stat";
 export { Accordion, type AccordionItem } from "./primitives/Accordion";
 export { Tabs, type TabItem } from "./primitives/Tabs";
 export { PrintButton } from "./primitives/PrintButton";
+export { LanguageSwitch } from "./primitives/LanguageSwitch";
 export { SkipLink } from "./primitives/SkipLink";
 export { Reveal } from "./primitives/Reveal";
 export { ErrorBoundary } from "./primitives/ErrorBoundary";
@@ -55,6 +57,12 @@ export {
 } from "./patterns/DualView";
 export { GateCard } from "./patterns/GateCard";
 export { GateBoard } from "./patterns/GateBoard";
+export { GateTimeline } from "./patterns/GateTimeline";
+export { IntentMeter } from "./patterns/IntentMeter";
+export { CostCalculator } from "./patterns/CostCalculator";
+export { ProcedureChecklist } from "./patterns/ProcedureChecklist";
+export { ConsentSheet } from "./patterns/ConsentSheet";
+export { UnitEconomicsTable } from "./patterns/UnitEconomicsTable";
 export { PhaseCard } from "./patterns/PhaseCard";
 export { RelayChart } from "./patterns/RelayChart";
 export { SpineMatrix } from "./patterns/SpineMatrix";

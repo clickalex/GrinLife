@@ -17,7 +17,7 @@ import type { AddressInfo } from "node:net";
 import type { Server } from "node:http";
 import { render, screen, waitFor } from "@testing-library/react";
 import { evaluateAll, gates, inputsForGate, type GateStatusRecord } from "@grin/content";
-import { GateStore, createApiRouter } from "@grin/api";
+import { GateStore, IntentStore, createApiRouter } from "@grin/api";
 import App from "./App";
 
 const realFetch = globalThis.fetch;
@@ -29,7 +29,13 @@ let base = "";
 beforeAll(async () => {
   const app = express();
   app.use(express.json());
-  app.use("/api", createApiRouter(new GateStore(resolve(dir, "gate-status.json"))));
+  app.use(
+    "/api",
+    createApiRouter(
+      new GateStore(resolve(dir, "gate-status.json")),
+      new IntentStore(resolve(dir, "intent.json")),
+    ),
+  );
   server = app.listen(0);
   await new Promise<void>((done) => server.once("listening", done));
   base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;

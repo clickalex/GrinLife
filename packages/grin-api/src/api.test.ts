@@ -8,12 +8,13 @@ import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import type { AddressInfo } from "node:net";
 import type { Server } from "node:http";
-import { GateStore } from "./store";
+import { GateStore, IntentStore } from "./store";
 import { createApiRouter } from "./router";
 
 const dir = mkdtempSync(resolve(tmpdir(), "grin-api-"));
 const filePath = resolve(dir, "nested/gate-status.json");
 const store = new GateStore(filePath);
+const intent = new IntentStore(resolve(dir, "intent.json"));
 
 let server: Server;
 let base = "";
@@ -21,7 +22,7 @@ let base = "";
 beforeAll(async () => {
   const app = express();
   app.use(express.json());
-  app.use("/api", createApiRouter(store));
+  app.use("/api", createApiRouter(store, intent));
   server = app.listen(0);
   await new Promise<void>((done) => server.once("listening", done));
   base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
@@ -196,5 +197,98 @@ describe("reset endpoints", () => {
 
     const all = await (await fetch(`${base}/api/gates/reset`, { method: "POST" })).json();
     expect(all.verdicts.every((v: { metCount: number }) => v.metCount === 0)).toBe(true);
+  });
+});
+
+const jsonPatch = (body: unknown) => ({
+  method: "PATCH",
+  headers: { "content-type": "application/json" },
+  body: JSON.stringify(body),
+});
+
+const jsonPost = (body: unknown) => ({
+  method: "POST",
+  headers: { "content-type": "application/json" },
+  body: JSON.stringify(body),
+});
+
+describe("gate history and the anti-drift rule", () => {
+  it("records a measurement for every patch", async () => {
+    await fetch(`${base}/api/gates/gate-1/criteria/1`, jsonPatch({ value: 120 }));
+
+    const body = (await (await fetch(`${base}/api/gates/history?gateId=gate-1`)).json()) as {
+      history: { kind: string; n?: string; value?: number }[];
+    };
+    const measurements = body.history.filter((entry) => entry.kind === "measurement");
+    expect(measurements.length).toBeGreaterThan(0);
+    expect(measurements.at(-1)).toMatchObject({ kind: "measurement", n: "1", value: 120 });
+  });
+
+  it("counts an assessment as a failure, and two of them kill the product", async () => {
+    // Gate 1 has 120 of the 250 customers it needs, so assessing it must fail.
+    await fetch(`${base}/api/gates/gate-1/assess`, { method: "POST" });
+    await fetch(`${base}/api/gates/gate-1/assess`, { method: "POST" });
+
+    const payload = (await (await fetch(`${base}/api/gates`)).json()) as {
+      antiDrift: Record<string, string>;
+      history: { gateId: string; kind: string; clear?: boolean }[];
+    };
+    expect(payload.antiDrift["gate-1"]).toBe("killed");
+    const failures = payload.history.filter(
+      (entry) => entry.gateId === "gate-1" && entry.kind === "assessment" && entry.clear === false,
+    );
+    expect(failures.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("does not let editing a criterion count as a failure", async () => {
+    for (const value of [10, 20, 30, 40]) {
+      await fetch(`${base}/api/gates/gate-2/criteria/2`, jsonPatch({ value }));
+    }
+    const payload = (await (await fetch(`${base}/api/gates`)).json()) as {
+      antiDrift: Record<string, string>;
+      history: { gateId: string; kind: string }[];
+    };
+    // Gate 2 has never been assessed, so four edits must leave it "clear", not killed.
+    expect(payload.antiDrift["gate-2"]).toBe("clear");
+    expect(
+      payload.history.filter((entry) => entry.gateId === "gate-2" && entry.kind === "assessment"),
+    ).toHaveLength(0);
+  });
+});
+
+describe("intent capture", () => {
+  it("counts an ask per product and publishes progress against the gate", async () => {
+    for (let i = 0; i < 3; i += 1) {
+      const response = await fetch(`${base}/api/intent`, jsonPost({ product: "legacy", source: "site" }));
+      expect(response.status).toBe(201);
+    }
+    const body = (await (await fetch(`${base}/api/intent`)).json()) as {
+      target: number;
+      counts: Record<string, number>;
+      lines: Record<string, string>;
+    };
+    expect(body.target).toBe(250);
+    expect(body.counts).toMatchObject({ legacy: 3, social: 0, serendipity: 0 });
+    expect(body.lines.legacy).toContain("250");
+  });
+
+  it("rejects a product the portfolio does not have", async () => {
+    const response = await fetch(`${base}/api/intent`, jsonPost({ product: "nope" }));
+    expect(response.status).toBe(400);
+  });
+
+  it("stores no contact details, because it accepts none", async () => {
+    await fetch(
+      `${base}/api/intent`,
+      jsonPost({
+        product: "social",
+        source: "email",
+        note: "asked about Pune",
+        email: "someone@example.com",
+      }),
+    );
+    const raw = readFileSync(resolve(dir, "intent.json"), "utf-8");
+    expect(raw).not.toContain("someone@example.com");
+    expect(raw).toContain("asked about Pune");
   });
 });

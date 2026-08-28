@@ -4,12 +4,14 @@ import {
   DualViewProvider,
   DualViewToggle,
   ErrorBoundary,
+  LanguageSwitch,
   SiteFooter,
   SiteHeader,
   SkipLink,
   useDocumentHead,
+  useLocale,
 } from "@grin/ui";
-import { pageDescriptionFor, pageTitleFor, portfolio, primaryNav } from "@grin/content";
+import { navFor, pageDescriptionFor, pageTitleFor, portfolio } from "@grin/content";
 import { Link, usePath } from "./router";
 import Home from "./pages/Home";
 import Roadmap from "./pages/Roadmap";
@@ -19,6 +21,7 @@ import Docs from "./pages/Docs";
 import Legacy from "./pages/Legacy";
 import Social from "./pages/Social";
 import Serendipity from "./pages/Serendipity";
+import Accessibility from "./pages/Accessibility";
 import NotFound from "./pages/NotFound";
 
 const footerColumns = [
@@ -31,6 +34,10 @@ const footerColumns = [
       { label: "Shared spine", href: "/spine" },
       { label: "Source documents", href: "/docs" },
     ],
+  },
+  {
+    title: "About this site",
+    links: [{ label: "Accessibility", href: "/accessibility" }],
   },
   {
     title: "Endorsed products",
@@ -56,8 +63,9 @@ function ScrollToTop() {
 
 export default function App() {
   const path = usePath();
+  const [locale, setLocale] = useLocale();
 
-  // Eight routes share one HTML shell; the head has to follow the router.
+  // Nine routes share one HTML shell; the head and the language have to follow the router.
   useDocumentHead({ title: pageTitleFor(path), description: pageDescriptionFor(path), path });
 
   return (
@@ -69,10 +77,15 @@ export default function App() {
         <SiteHeader
           brand={portfolio.name}
           tagline="Three products · one spine"
-          links={primaryNav}
+          links={navFor(locale)}
           currentPath={path}
           Link={Link}
-          actions={<DualViewToggle />}
+          actions={
+            <div className="flex flex-wrap items-center gap-3">
+              <LanguageSwitch locale={locale} onChange={setLocale} />
+              <DualViewToggle />
+            </div>
+          }
         />
 
         <main id="main">
@@ -82,6 +95,7 @@ export default function App() {
             <Route path="/gates" component={Gates} />
             <Route path="/spine" component={Spine} />
             <Route path="/docs" component={Docs} />
+            <Route path="/accessibility" component={Accessibility} />
             <Route path="/products/legacy" component={Legacy} />
             <Route path="/products/social" component={Social} />
             <Route path="/products/serendipity" component={Serendipity} />

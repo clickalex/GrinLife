@@ -7,14 +7,17 @@
  * page copy still carries no Grin reference and that is asserted by a test, but the
  * structural separation is gone. See ROADMAP.md, "Deliberate deviation".
  */
-import { Callout, Eyebrow, Heading, ProductSite, TermTable, useLocalStorage } from "@grin/ui";
+import { Callout, Eyebrow, Heading, IntentMeter, ProductSite, TermTable, useLocalStorage } from "@grin/ui";
 import { serendipity, serendipityClosing, serendipityPhases, structure } from "@grin/content";
 import { Link } from "../router";
+import { useIntent } from "../lib/useIntent";
 import { Overview } from "../sections/serendipity/Overview";
 import { Safety } from "../sections/serendipity/Safety";
 import { Beta } from "../sections/serendipity/Beta";
 
 export default function Serendipity() {
+  const intent = useIntent("serendipity");
+
   const [explored, setExplored] = useLocalStorage<string[]>("grinlife:explored-phases", []);
 
   const toggle = (phaseId: string) =>
@@ -56,9 +59,23 @@ export default function Serendipity() {
         </div>
       }
       afterCompliance={
-        <Callout tone="note" label="A final word on this one">
-          <p>{serendipityClosing}</p>
-        </Callout>
+        <div className="space-y-10">
+          {intent.count !== undefined ? (
+            <IntentMeter
+              productName={serendipity.name}
+              count={intent.count}
+              target={intent.target}
+              onAsk={() => void intent.ask()}
+              busy={intent.busy}
+              asked={intent.asked}
+              accent="violet"
+            />
+          ) : null}
+
+          <Callout tone="note" label="A final word on this one">
+            <p>{serendipityClosing}</p>
+          </Callout>
+        </div>
       }
     />
   );

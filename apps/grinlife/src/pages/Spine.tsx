@@ -4,6 +4,7 @@
  * actually lives in the code you are reading.
  */
 import {
+  Badge,
   Callout,
   DataTable,
   Eyebrow,
@@ -16,7 +17,14 @@ import {
   accentOf,
   cn,
 } from "@grin/ui";
-import { codebaseSpine, spineIntro, spinePayoff, spineRows } from "@grin/content";
+import {
+  codebaseSpine,
+  handoffContract,
+  handoffOutstanding,
+  spineIntro,
+  spinePayoff,
+  spineRows,
+} from "@grin/content";
 
 export default function Spine() {
   const wave1 = spineRows.filter((row) => row.builtIn.startsWith("Wave 1")).length;
@@ -87,6 +95,48 @@ export default function Spine() {
                 <span key="d">{row.detail}</span>,
               ])}
             />
+
+            <div className="space-y-4">
+              <div className="space-y-3">
+                <Eyebrow accent="moss">The hand-off contract</Eyebrow>
+                <Heading size="title">What each wave owes the next</Heading>
+                <Lede>
+                  <code className="font-mono text-sm">handsNextWave</code> says what a wave hands on. This
+                  says what the receiving wave is entitled to expect, and what would count as evidence that it
+                  arrived — because a shared spine survives three separate teams only if the hand-off is a
+                  contract and not a hope. {handoffOutstanding().length} of {handoffContract.length}{" "}
+                  obligations are still outstanding.
+                </Lede>
+              </div>
+
+              <DataTable
+                accent="moss"
+                caption="Relay hand-off obligations, from wave to wave, with the evidence each one requires"
+                head={["Obligation", "From", "To", "Evidence it arrived", "Status"]}
+                rows={handoffContract.map((item) => [
+                  <span key="o" className="font-bold text-foreground">
+                    {item.obligation}
+                  </span>,
+                  <span key="f" className="text-ink-soft">
+                    {item.from}
+                  </span>,
+                  <span key="t" className="text-ink-soft">
+                    {item.to}
+                  </span>,
+                  <span key="e" className="text-muted-foreground">
+                    {item.evidence}
+                  </span>,
+                  <Badge
+                    key="s"
+                    accent={item.status === "delivered" ? "moss" : "honey"}
+                    tone={item.status === "delivered" ? "soft" : "outline"}
+                    mono
+                  >
+                    {item.status}
+                  </Badge>,
+                ])}
+              />
+            </div>
 
             <Callout tone="rule" label="The test of a shared spine">
               <p>
