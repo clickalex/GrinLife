@@ -298,9 +298,12 @@ consecutive clean passes. Any failing attempt resets the streak to zero rather t
 skipped. It has been run to 10 and then to 20.
 
 **Latest result: 20 consecutive clean passes, plus a confirmation run — 21 clean audits in a
-row, 116/116 checks each, 37–41 s per attempt (811 s total).** That is also 21 consecutive
-passes of the 201-test suite and 21 clean production builds. `AUDIT-STREAK.md` is the log.
-The first streak, at 105 checks and 194 tests, reached 10 consecutive passes.
+row, 122/122 checks each, 43–49 s per attempt.** That is also 21 consecutive passes of the
+254-test suite and 21 clean production builds. `AUDIT-STREAK.md` is the log.
+
+The 20-pass target has now been reached twice, against different codebases: once at 116 checks
+and 201 tests, and again after the eleven remaining `IDEAS.md` proposals were built, at 122
+checks and 254 tests. The first streak, at 105 checks and 194 tests, reached 10.
 
 The harness now runs one extra audit _after_ writing its own report, because the first version
 did not and that turned out to matter.
