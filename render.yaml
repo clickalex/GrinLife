@@ -24,10 +24,10 @@ services:
     # /api/health answers 200 with JSON and touches no disk, so it is a true liveness probe.
     healthCheckPath: /api/health
     autoDeploy: true
-    disk:
-      name: grinlife-data
-      mountPath: /var/data
-      sizeGB: 1
+    #disk:
+      #name: grinlife-data
+      #mountPath: /var/data
+      #sizeGB: 1
     envVars:
       - key: NODE_VERSION
         value: 22.22.3
