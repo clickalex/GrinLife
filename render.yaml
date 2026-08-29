@@ -5,12 +5,12 @@
 # generates /sitemap.xml and /robots.txt, injects each route's <head> server-side, and
 # returns a real 404 status on unknown paths. None of that exists on a static host.
 #
-# The `disk` block is the reason for `plan: starter`. Gate measurements, gate history and
-# intent counts are written as JSON files, so they need a filesystem that survives a
-# restart. Render's free tier has an ephemeral filesystem — it will appear to work and
-# then silently lose every recorded gate decision on the next deploy. To try it on free
-# anyway, set `plan: free` and delete the `disk:` block; the site still runs, but nothing
-# persists.
+# This branch is configured for Render's free tier, so it avoids paid features:
+# no Starter plan and no persistent disk. The app still runs, but all writes live on
+# Render's ephemeral filesystem and can disappear on the next restart or deploy.
+#
+# If you later upgrade to Starter, change `plan: free` to `plan: starter`, add a `disk:`
+# block mounted at /var/data, and point GRIN_DATA_FILE / GRIN_INTENT_FILE there.
 
 services:
   - type: web
@@ -24,10 +24,6 @@ services:
     # /api/health answers 200 with JSON and touches no disk, so it is a true liveness probe.
     healthCheckPath: /api/health
     autoDeploy: true
-    #disk:
-      #name: grinlife-data
-      #mountPath: /var/data
-      #sizeGB: 1
     envVars:
       - key: NODE_VERSION
         value: 22.22.3
@@ -35,12 +31,12 @@ services:
       # server paths. The app checks NODE_ENV explicitly for exactly that reason.
       - key: NODE_ENV
         value: production
-      # Both paths must live on the mounted disk, or they are written to the container
-      # filesystem and lost on the next deploy.
+      # Free-tier Render has no mounted disk, so writes stay inside the app checkout.
+      # That path is writable during runtime but ephemeral across restarts and deploys.
       - key: GRIN_DATA_FILE
-        value: /var/data/gate-status.json
+        value: /opt/render/project/src/apps/grinlife/data/gate-status.json
       - key: GRIN_INTENT_FILE
-        value: /var/data/intent.json
+        value: /opt/render/project/src/apps/grinlife/data/intent.json
       # Canonical origin for sitemap.xml, robots.txt, og:url and rel=canonical.
       # Set per environment (e.g. https://grinlife.onrender.com); it is not committed.
       - key: GRIN_SITE_URL
