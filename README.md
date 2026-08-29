@@ -122,7 +122,7 @@ avoids the paid Starter plan and persistent disk. It sets:
 
 | Setting                              | Value                                                    | Why                                                                        |
 | ------------------------------------ | -------------------------------------------------------- | -------------------------------------------------------------------------- |
-| `buildCommand`                       | `npm ci && npm run build`                                | A deploy must be reproducible from the lockfile                            |
+| `buildCommand`                       | `npm ci --include=dev && npm run build`                  | Render builds with `NODE_ENV=production`, so dev tools must be included    |     
 | `startCommand`                       | `npm start`                                              | Serves the site and the status API from `dist/`                            |
 | `healthCheckPath`                    | `/api/health`                                            | Answers 200 JSON and touches no disk                                       |
 | `NODE_ENV`                           | `production`                                             | Without it the error handler includes `err.message`, leaking server paths  |
