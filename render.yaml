@@ -1,17 +1,3 @@
-# Render Blueprint — deploy this repo with `New +` → `Blueprint` and point it at the repo.
-# https://render.com/docs/blueprint-spec
-#
-# This app is a Node server, not a static site: it mounts the status API at /api,
-# generates /sitemap.xml and /robots.txt, injects each route's <head> server-side, and
-# returns a real 404 status on unknown paths. None of that exists on a static host.
-#
-# This branch is configured for Render's free tier, so it avoids paid features:
-# no Starter plan and no persistent disk. The app still runs, but all writes live on
-# Render's ephemeral filesystem and can disappear on the next restart or deploy.
-#
-# If you later upgrade to Starter, change `plan: free` to `plan: starter`, add a `disk:`
-# block mounted at /var/data, and point GRIN_DATA_FILE / GRIN_INTENT_FILE there.
-
 services:
   - type: web
     name: grinlife
@@ -19,7 +5,10 @@ services:
     plan: free
     region: oregon
     # npm ci, not npm install: the lockfile is tracked and a deploy must be reproducible.
-    buildCommand: npm ci && npm run build
+    # `NODE_ENV=production` is set below for runtime safety, and Render exposes env vars
+    # during build too, so `npm ci` must include devDependencies explicitly or Vite / esbuild
+    # are omitted and the build fails with `vite: not found`.
+    buildCommand: npm ci --include=dev && npm run build
     startCommand: npm start
     # /api/health answers 200 with JSON and touches no disk, so it is a true liveness probe.
     healthCheckPath: /api/health
@@ -27,17 +16,11 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 22.22.3
-      # Without this the error handler includes err.message in its response, which leaks
-      # server paths. The app checks NODE_ENV explicitly for exactly that reason.
       - key: NODE_ENV
         value: production
-      # Free-tier Render has no mounted disk, so writes stay inside the app checkout.
-      # That path is writable during runtime but ephemeral across restarts and deploys.
       - key: GRIN_DATA_FILE
         value: /opt/render/project/src/apps/grinlife/data/gate-status.json
       - key: GRIN_INTENT_FILE
         value: /opt/render/project/src/apps/grinlife/data/intent.json
-      # Canonical origin for sitemap.xml, robots.txt, og:url and rel=canonical.
-      # Set per environment (e.g. https://grinlife.onrender.com); it is not committed.
       - key: GRIN_SITE_URL
         sync: false
