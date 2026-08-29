@@ -117,22 +117,25 @@ status API at `/api`, generates `/sitemap.xml` and `/robots.txt`, injects each r
 server-side, and returns a real 404 status on unknown paths.
 
 `render.yaml` is a ready Blueprint — on Render, choose **New +** → **Blueprint** and point it at
-this repository. It sets:
+this repository. The copy committed on this branch is configured for **Render free tier**, so it
+avoids the paid Starter plan and persistent disk. It sets:
 
-| Setting                              | Value                     | Why                                                                       |
-| ------------------------------------ | ------------------------- | ------------------------------------------------------------------------- |
-| `buildCommand`                       | `npm ci && npm run build` | A deploy must be reproducible from the lockfile                           |
-| `startCommand`                       | `npm start`               | Serves the site and the status API from `dist/`                           |
-| `healthCheckPath`                    | `/api/health`             | Answers 200 JSON and touches no disk                                      |
-| `NODE_ENV`                           | `production`              | Without it the error handler includes `err.message`, leaking server paths |
-| `GRIN_DATA_FILE`, `GRIN_INTENT_FILE` | under `/var/data`         | Both must sit on the mounted disk                                         |
-| `GRIN_SITE_URL`                      | set per environment       | Canonical origin for the sitemap, `og:url` and `rel=canonical`            |
+| Setting                              | Value                                                    | Why                                                                        |
+| ------------------------------------ | -------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `buildCommand`                       | `npm ci && npm run build`                                | A deploy must be reproducible from the lockfile                            |
+| `startCommand`                       | `npm start`                                              | Serves the site and the status API from `dist/`                            |
+| `healthCheckPath`                    | `/api/health`                                            | Answers 200 JSON and touches no disk                                       |
+| `NODE_ENV`                           | `production`                                             | Without it the error handler includes `err.message`, leaking server paths  |
+| `GRIN_DATA_FILE`, `GRIN_INTENT_FILE` | `/opt/render/project/src/apps/grinlife/data/*.json`      | Writable on free tier, but only on Render's ephemeral filesystem           |
+| `GRIN_SITE_URL`                      | set per environment                                      | Canonical origin for the sitemap, `og:url` and `rel=canonical`             |
 
-**The disk is why the blueprint uses `plan: starter`.** Gate measurements, gate history and
-intent counts are JSON files, so they need a filesystem that survives a restart. Render's free
-tier is ephemeral — it will appear to work and then silently lose every recorded gate decision
-on the next deploy. To try it on free anyway, set `plan: free` and delete the `disk:` block; the
-site still runs, nothing persists, and the gates page says it is browser-local.
+**Free-tier trade-off:** gate measurements, gate history and intent counts are written as JSON
+files, so on the free plan they can disappear on the next restart or deploy. The site still
+runs, but nothing server-written is durable.
+
+If you later upgrade to a paid Render service, switch the blueprint back to `plan: starter`, add
+a persistent `disk:` mounted at `/var/data`, and point `GRIN_DATA_FILE` / `GRIN_INTENT_FILE`
+there so those JSON files survive restarts.
 
 Anywhere else that runs a Node process with a disk works the same way — Fly.io, Railway, a
 container, or a VPS:
