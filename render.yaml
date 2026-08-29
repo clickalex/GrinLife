@@ -16,7 +16,7 @@ services:
   - type: web
     name: grinlife
     runtime: node
-    plan: starter
+    plan: free
     region: oregon
     # npm ci, not npm install: the lockfile is tracked and a deploy must be reproducible.
     buildCommand: npm ci && npm run build
